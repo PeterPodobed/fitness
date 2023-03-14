@@ -27,35 +27,41 @@ public class UserController {
         this.service = service;
     }
 
-    @RequestMapping(method = RequestMethod.POST)
-    protected ResponseEntity<?> doPost(@RequestBody UserRegistrationDto userRegistration) {
+    @RequestMapping(path = "/registration", method = RequestMethod.POST)
+    protected ResponseEntity<?> createUser (@RequestBody UserRegistrationDto userRegistration) {
         if (service.create(userRegistration)) {
             return new ResponseEntity<>(HttpStatus.CREATED);
         }
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
+    @RequestMapping(method = RequestMethod.GET)
+    protected ResponseEntity<PageDto<UserDto>> getPage(
+            @RequestParam(name = "number", required = false, defaultValue = "0") int number,
+            @RequestParam(name = "size", required = false, defaultValue = "20") int size)
+            throws MultipleErrorResponse {
+        return ResponseEntity.status(HttpStatus.OK).body(service.getPage(number, size));
+    }
+
     @RequestMapping(path = "/me", method = RequestMethod.GET)
-    public ResponseEntity<UserDto> getCart(@PathVariable("me") UUID uuid) throws MultipleErrorResponse {
+    protected ResponseEntity<UserDto> getCart(@PathVariable("me") UUID uuid) throws MultipleErrorResponse {
         return ResponseEntity.status(HttpStatus.OK).body(service.getCart(uuid));
     }
 
     @RequestMapping(path = "/verification", method = RequestMethod.GET)
-    public ResponseEntity<?> verification(@PathVariable("verificationCode") int verificationCode,
-                                          @PathVariable("mail") String mail) {
-        if (service.verification(verificationCode, mail)) {
-            return new ResponseEntity<>(HttpStatus.CREATED);
-        }
-        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    protected ResponseEntity<?> verification(
+                    @RequestParam(name = "code") String code,
+                    @RequestParam(name = "mail") String mail) {
+        service.verification(code, mail);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @GetMapping(path = "/{uuid}")
-    protected ResponseEntity<UserDto> get(@PathVariable("uuid") UUID uuid) throws SingleErrorResponse {
-        service.get(uuid);
-        return new ResponseEntity<>(HttpStatus.OK);
+    protected ResponseEntity<UserDto> get(@PathVariable("uuid") UUID uuid) throws SingleErrorResponse, MultipleErrorResponse {
+        return ResponseEntity.status(HttpStatus.OK).body(service.get(uuid));
     }
 
-    @PutMapping(path = "{uuid}/dt_update/{dt_update}")
+    @PutMapping(path = "/{uuid}/dt_update/{dt_update}")
     protected ResponseEntity<?> update(
             @PathVariable("uuid") UUID uuid,
             @PathVariable("dt_update") LocalDateTime dt_update,
@@ -63,21 +69,6 @@ public class UserController {
             throws SingleErrorResponse, MultipleErrorResponse {
         service.update(uuid, dt_update, user);
         return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-
-    @RequestMapping(method = RequestMethod.DELETE)
-    protected ResponseEntity<?> doDelete(@RequestBody UUID uuid){
-        service.delete(uuid);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<PageDto<UserDto>> getPage(
-            @RequestParam(name = "number", required = false, defaultValue = "0") int number,
-            @RequestParam(name = "size", required = false, defaultValue = "20") int size)
-            throws MultipleErrorResponse {
-        return ResponseEntity.status(HttpStatus.OK).body(service.getPage(number, size));
     }
 
 

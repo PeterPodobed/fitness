@@ -3,6 +3,7 @@ package by.it_academy.fitness.service.products;
 import by.it_academy.fitness.core.dto.PageDto;
 import by.it_academy.fitness.core.dto.products.ProductCreateDto;
 import by.it_academy.fitness.core.dto.products.ProductDto;
+import by.it_academy.fitness.core.exception.UserMessage;
 import by.it_academy.fitness.dao.api.IProductDao;
 import by.it_academy.fitness.dao.entity.products.ProductEntity;
 import by.it_academy.fitness.service.convertion.products.api.IDtoToProductEntity;
@@ -31,9 +32,12 @@ public class ProductService implements IProductService {
 
     @Override
     public boolean createProduct(ProductCreateDto productCreateDTO) {
+        Optional<ProductEntity> productEntity = iProductDao.findByTitle(productCreateDTO.getTitle());
+        if (productEntity.isEmpty()){
         ProductEntity entity = iDtoToProductEntity.convertDtoToProductEntity(productCreateDTO);
         iProductDao.save(entity);
-        return true;
+        return true;}
+        else throw new UserMessage("Продукт с таким названием уже зарегистрирован");
     }
 
     @Override
@@ -75,4 +79,5 @@ public class ProductService implements IProductService {
                 productEntityPage.isFirst(), productEntityPage.getNumberOfElements(),
                 productEntityPage.isLast(), listDto );
     }
+
 }

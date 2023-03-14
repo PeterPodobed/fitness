@@ -9,25 +9,82 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
-public class UserCreateDto extends UserDto{
-    UserDto userCreate;
-    String password;
+public class UserCreateDto {
+    private UUID uuid;
+    private LocalDateTime dt_create;
+    private LocalDateTime dt_update;
+    private String mail;
+    private String fio;
+    private UserRole role;
+    private UserStatus status;
+    private String password;
 
     public UserCreateDto(UUID uuid, LocalDateTime dt_create, LocalDateTime dt_update,
-                         String mail, String fio, UserRole role, UserStatus status,
-                         UserDto userCreate, String password) throws MultipleErrorResponse {
-        super(uuid, dt_create, dt_update, mail, fio, role, status);
-        this.userCreate = userCreate;
+                         String mail, String fio, UserRole role, UserStatus status, String password) {
+        this.uuid = uuid;
+        this.dt_create = dt_create;
+        this.dt_update = dt_update;
+        this.mail = mail;
+        this.fio = fio;
+        this.role = role;
+        this.status = status;
         this.password = password;
-        validate();
     }
 
-    public UserDto getUserCreate() {
-        return userCreate;
+    public UUID getUuid() {
+        return uuid;
     }
 
-    public void setUserCreate(UserDto userCreate) {
-        this.userCreate = userCreate;
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
+    public LocalDateTime getDt_create() {
+        return dt_create;
+    }
+
+    public void setDt_create(LocalDateTime dt_create) {
+        this.dt_create = dt_create;
+    }
+
+    public LocalDateTime getDt_update() {
+        return dt_update;
+    }
+
+    public void setDt_update(LocalDateTime dt_update) {
+        this.dt_update = dt_update;
+    }
+
+    public String getMail() {
+        return mail;
+    }
+
+    public void setMail(String mail) {
+        this.mail = mail;
+    }
+
+    public String getFio() {
+        return fio;
+    }
+
+    public void setFio(String fio) {
+        this.fio = fio;
+    }
+
+    public UserRole getRole() {
+        return role;
+    }
+
+    public void setRole(UserRole role) {
+        this.role = role;
+    }
+
+    public UserStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(UserStatus status) {
+        this.status = status;
     }
 
     public String getPassword() {
@@ -38,32 +95,4 @@ public class UserCreateDto extends UserDto{
         this.password = password;
     }
 
-    public void validate() throws MultipleErrorResponse {
-        MultipleErrorResponse errorResponse = new MultipleErrorResponse("invalid fields");
-        PasswordValid.validate(errorResponse, this.password);
-        if (!errorResponse.getErrors().isEmpty()) {
-            throw errorResponse;
-        }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        UserCreateDto that = (UserCreateDto) o;
-        return Objects.equals(userCreate, that.userCreate) && Objects.equals(password, that.password);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(userCreate, password);
-    }
-
-    @Override
-    public String toString() {
-        return "UserCreate{" +
-                "userCreate=" + userCreate +
-                ", password='" + password + '\'' +
-                '}';
-    }
 }

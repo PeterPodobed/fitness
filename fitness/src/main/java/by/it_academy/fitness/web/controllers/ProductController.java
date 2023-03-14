@@ -38,7 +38,7 @@ public class ProductController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<PageDto<ProductDto>> getPage(
+    protected ResponseEntity<PageDto<ProductDto>> getPage(
             @RequestParam(name = "number", required = false, defaultValue = "0") int number,
             @RequestParam(name = "size", required = false, defaultValue = "20") int size){
         return ResponseEntity.status(HttpStatus.OK).body(service.getPage(number, size));

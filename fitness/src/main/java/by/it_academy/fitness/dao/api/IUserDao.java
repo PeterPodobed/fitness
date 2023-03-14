@@ -8,12 +8,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.ListCrudRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 //@Repository
 public interface IUserDao extends ListCrudRepository<UserEntity, UUID> {
 
-    UserEntity findByMail(String mail);
+    Optional<UserEntity> findByMail(String mail);
 
     Page<UserEntity> findAll(Pageable pageable);
 

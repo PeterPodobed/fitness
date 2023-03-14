@@ -10,26 +10,38 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/v1/recipe")
 public class RecipeController {
-    private final IRecipeService service;
+    private final IRecipeService iRecipeService;
 
     public RecipeController(IRecipeService service) {
-        this.service = service;
+        this.iRecipeService = service;
     }
 
-    @PostMapping
-    public void createRecipe(@RequestBody @Validated RecipeCreateDto recipeCreate) throws SingleErrorResponse {
-        service.create(recipeCreate);
+    @RequestMapping(method = RequestMethod.POST)
+    protected ResponseEntity<?> createRecipe(@RequestBody @Validated RecipeCreateDto recipeCreate)
+            throws SingleErrorResponse {
+        iRecipeService.create(recipeCreate);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<PageDto<RecipeDto>> getPage(
+    protected ResponseEntity<PageDto<RecipeDto>> getPage(
             @RequestParam(name = "number", required = false, defaultValue = "0") int number,
-            @RequestParam(name = "size", required = false, defaultValue = "20") int size){
-        return ResponseEntity.status(HttpStatus.OK).body(service.getPage(number, size));
+            @RequestParam(name = "size", required = false, defaultValue = "20") int size) {
+        return ResponseEntity.status(HttpStatus.OK).body(iRecipeService.getPage(number, size));
     }
 
+    @PutMapping(path = "{uuid}/dt_update/{dt_update}")
+    protected ResponseEntity<?> update(@PathVariable("uuid") UUID uuid,
+                                       @PathVariable("dt_update") LocalDateTime dt_update,
+                                       @RequestBody RecipeCreateDto recipe) throws SingleErrorResponse {
+        iRecipeService.updateRecipe(uuid, dt_update, recipe);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
 }

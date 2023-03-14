@@ -11,15 +11,14 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
-@JsonPropertyOrder({"mail", "fio"})
 public class UserDto {
-    UUID uuid;
-    LocalDateTime dt_create;
-    LocalDateTime dt_update;
-    String mail;
-    String fio;
-    UserRole role;
-    UserStatus status;
+    private UUID uuid;
+    private LocalDateTime dt_create;
+    private LocalDateTime dt_update;
+    private String mail;
+    private String fio;
+    private UserRole role;
+    private UserStatus status;
 
 
     public UserDto(UUID uuid, LocalDateTime dt_create, LocalDateTime dt_update,

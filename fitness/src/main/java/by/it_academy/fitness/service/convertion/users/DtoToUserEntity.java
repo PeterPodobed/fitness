@@ -14,7 +14,10 @@ import java.util.UUID;
 
 @Component
 public class DtoToUserEntity implements IDtoToUserEntity {
+
+
     public UserEntity convertDtoToEntityByUser(UserRegistrationDto userRegistrationDTO) {
+        int code = (int)(Math.random() * 10000);
         return new UserEntity(UUID.randomUUID(),
                 LocalDateTime.now(),
                 LocalDateTime.now(),
@@ -22,7 +25,7 @@ public class DtoToUserEntity implements IDtoToUserEntity {
                 userRegistrationDTO.getFio(),
                 new UserRoleEntity(UserRole.USER),
                 new UserStatusEntity(UserStatus.WAITING_ACTIVATION),
-                (int)(Math.random() * 10000),
+                Integer.toString(code),
                 userRegistrationDTO.getPassword()
         );
     }

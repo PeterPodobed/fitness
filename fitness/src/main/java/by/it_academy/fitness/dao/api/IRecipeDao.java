@@ -11,6 +11,7 @@ import java.util.UUID;
 public interface IRecipeDao extends ListCrudRepository<RecipeEntity, UUID> {
     boolean existsByTitle(String title);
 
+
     Page<RecipeEntity> findAll(Pageable pageable);
 
 

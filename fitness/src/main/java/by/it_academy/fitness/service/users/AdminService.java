@@ -34,7 +34,6 @@ public class AdminService implements IAdminService {
 
     @Override
     public void update(UUID uuid, LocalDateTime dt_update, UserCreateDto user) throws MultipleErrorResponse, SingleErrorResponse {
-        user.validate();
         UserEntity userEntity = dao.findById(uuid).orElseThrow(() ->
                 new SingleErrorResponse("NoSuchElement", "unknown uuid"));
         if (dt_update != userEntity.getDtUpdate()) {

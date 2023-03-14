@@ -49,7 +49,7 @@ public class UserEntity {
     private UserStatusEntity status;
 
     @Column(name = "code", table= "user_code")
-    private int verificationCode;
+    private String verificationCode;
 
     @Column(name = "password")
     private String password;
@@ -59,7 +59,7 @@ public class UserEntity {
 
     public UserEntity(UUID uuid, LocalDateTime dtCreate, LocalDateTime dtUpdate,
                       String mail, String fio, UserRoleEntity role, UserStatusEntity status,
-                      int verificationCode, String password) {
+                      String verificationCode, String password) {
         this.uuid = uuid;
         this.dtCreate = dtCreate;
         this.dtUpdate = dtUpdate;
@@ -159,11 +159,11 @@ public class UserEntity {
         this.password = password;
     }
 
-    public int getVerificationCode() {
+    public String getVerificationCode() {
         return verificationCode;
     }
 
-    public void setVerificationCode(int verificationCode) {
+    public void setVerificationCode(String verificationCode) {
         this.verificationCode = verificationCode;
     }
 
