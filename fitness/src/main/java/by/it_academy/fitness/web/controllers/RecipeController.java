@@ -3,6 +3,7 @@ package by.it_academy.fitness.web.controllers;
 import by.it_academy.fitness.core.dto.PageDto;
 import by.it_academy.fitness.core.dto.products.RecipeCreateDto;
 import by.it_academy.fitness.core.dto.products.RecipeDto;
+import by.it_academy.fitness.core.exception.MultipleErrorResponse;
 import by.it_academy.fitness.core.exception.SingleErrorResponse;
 import by.it_academy.fitness.service.products.api.IRecipeService;
 import org.springframework.http.HttpStatus;
@@ -32,7 +33,7 @@ public class RecipeController {
     @RequestMapping(method = RequestMethod.GET)
     protected ResponseEntity<PageDto<RecipeDto>> getPage(
             @RequestParam(name = "number", required = false, defaultValue = "0") int number,
-            @RequestParam(name = "size", required = false, defaultValue = "20") int size) {
+            @RequestParam(name = "size", required = false, defaultValue = "20") int size) throws MultipleErrorResponse {
         return ResponseEntity.status(HttpStatus.OK).body(iRecipeService.getPage(number, size));
     }
 

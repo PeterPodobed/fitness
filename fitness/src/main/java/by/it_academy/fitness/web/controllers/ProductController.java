@@ -4,6 +4,7 @@ package by.it_academy.fitness.web.controllers;
 import by.it_academy.fitness.core.dto.PageDto;
 import by.it_academy.fitness.core.dto.products.ProductCreateDto;
 import by.it_academy.fitness.core.dto.products.ProductDto;
+import by.it_academy.fitness.core.exception.MultipleErrorResponse;
 import by.it_academy.fitness.service.products.api.IProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +41,7 @@ public class ProductController {
     @RequestMapping(method = RequestMethod.GET)
     protected ResponseEntity<PageDto<ProductDto>> getPage(
             @RequestParam(name = "number", required = false, defaultValue = "0") int number,
-            @RequestParam(name = "size", required = false, defaultValue = "20") int size){
+            @RequestParam(name = "size", required = false, defaultValue = "20") int size) throws MultipleErrorResponse {
         return ResponseEntity.status(HttpStatus.OK).body(service.getPage(number, size));
     }
 
