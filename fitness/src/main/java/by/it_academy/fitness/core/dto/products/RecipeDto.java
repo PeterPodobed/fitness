@@ -1,7 +1,8 @@
 package by.it_academy.fitness.core.dto.products;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Version;
+import by.it_academy.fitness.core.exception.MultipleErrorResponse;
+import by.it_academy.fitness.core.exception.validationRecipe.RecipeCreateTitleValid;
+import by.it_academy.fitness.core.exception.validationRecipe.RecipeCreateValid;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -19,7 +20,7 @@ public class RecipeDto {
 
     public RecipeDto(UUID uuid, LocalDateTime dt_create, LocalDateTime dt_update,
                      String title, double weight, double calories, double proteins,
-                     double fats, double carbohydrates) {
+                     double fats, double carbohydrates) throws MultipleErrorResponse {
         this.uuid = uuid;
         this.dt_create = dt_create;
         this.dt_update = dt_update;
@@ -29,8 +30,21 @@ public class RecipeDto {
         this.proteins = proteins;
         this.fats = fats;
         this.carbohydrates = carbohydrates;
+        validate();
     }
 
+    public void validate() throws MultipleErrorResponse {
+        MultipleErrorResponse errorResponse = new MultipleErrorResponse("Данные отсутствуют");
+        RecipeCreateTitleValid.validate(errorResponse, this.title);
+        RecipeCreateValid.validate(errorResponse, Double.toString(this.weight));
+        RecipeCreateValid.validate(errorResponse, Double.toString(this.calories));
+        RecipeCreateValid.validate(errorResponse, Double.toString(this.proteins));
+        RecipeCreateValid.validate(errorResponse, Double.toString(this.fats));
+        RecipeCreateValid.validate(errorResponse, Double.toString(this.carbohydrates));
+        if (!errorResponse.getErrors().isEmpty()) {
+            throw errorResponse;
+        }
+    }
     public UUID getUuid() {
         return uuid;
     }

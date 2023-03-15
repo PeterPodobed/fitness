@@ -3,6 +3,7 @@ package by.it_academy.fitness.service.products.api;
 import by.it_academy.fitness.core.dto.PageDto;
 import by.it_academy.fitness.core.dto.products.ProductCreateDto;
 import by.it_academy.fitness.core.dto.products.ProductDto;
+import by.it_academy.fitness.core.exception.MultipleErrorResponse;
 import by.it_academy.fitness.dao.entity.products.ProductEntity;
 
 import java.time.LocalDateTime;
@@ -17,5 +18,5 @@ public interface IProductService {
 
     Optional<ProductEntity> findByUUID (UUID uuid);
 
-    PageDto<ProductDto> getPage (int number, int size);
+    PageDto<ProductDto> getPage (int number, int size) throws MultipleErrorResponse;
 }

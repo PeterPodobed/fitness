@@ -1,5 +1,9 @@
 package by.it_academy.fitness.core.dto.products;
 
+import by.it_academy.fitness.core.exception.MultipleErrorResponse;
+import by.it_academy.fitness.core.exception.validationRecipe.RecipeCreateTitleValid;
+import by.it_academy.fitness.core.exception.validationRecipe.RecipeCreateValid;
+
 import java.util.UUID;
 
 public class CompositionDto {
@@ -9,6 +13,14 @@ public class CompositionDto {
     public CompositionDto(UUID uuid, int weight) {
         this.uuidProduct = uuid;
         this.weight = weight;
+    }
+
+    public void validate() throws MultipleErrorResponse {
+        MultipleErrorResponse errorResponse = new MultipleErrorResponse("Данные отсутствуют");
+        RecipeCreateValid.validate(errorResponse, Integer.toString(this.weight));
+        if (!errorResponse.getErrors().isEmpty()) {
+            throw errorResponse;
+        }
     }
 
     public UUID getUuidProduct() {

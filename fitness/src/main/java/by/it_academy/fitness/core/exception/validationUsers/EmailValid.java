@@ -9,19 +9,10 @@ public class EmailValid {
 
     public static void validate(MultipleErrorResponse errorResponse, String mail) {
         if (mail == null || mail.isBlank()) {
-            errorResponse.add(new ErrorField("empty", "mail"));
+            errorResponse.add(new ErrorField("Данные отстутствуют", "mail"));
         }
         if (mail != null && !mail.matches(EMAIL_PATTERN)) {
-            errorResponse.add(new ErrorField("invalid email format", "mail"));
-        }
-    }
-
-    public static void validate(String mail) throws SingleErrorResponse {
-        if (mail.isBlank()) {
-            throw new SingleErrorResponse("empty", "mail");
-        }
-        if (!mail.matches(EMAIL_PATTERN)) {
-            throw new SingleErrorResponse("invalid email format", "mail");
+            errorResponse.add(new ErrorField("Данные введены некорректно", "mail"));
         }
     }
 }

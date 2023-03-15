@@ -9,6 +9,7 @@ import by.it_academy.fitness.dao.entity.products.ProductEntity;
 import by.it_academy.fitness.dao.entity.products.RecipeEntity;
 import by.it_academy.fitness.service.convertion.recipe.api.IRecipeEntityToDto;
 import by.it_academy.fitness.service.products.api.IRecipeService;
+import by.it_academy.fitness.service.products.dataCalculation.ICalculationRecipe;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,12 +25,16 @@ public class RecipeService implements IRecipeService {
     private final IRecipeDao iRecipeDao;
     private final IProductDao iProductDao;
     private final IRecipeEntityToDto iRecipeEntityToDto;
+    private final ICalculationRecipe iCalculationRecipe;
 
 
-    public RecipeService(IRecipeDao iRecipeDao, IProductDao iProductDao, IRecipeEntityToDto iRecipeEntityToDto) {
+
+    public RecipeService(IRecipeDao iRecipeDao, IProductDao iProductDao,
+                         IRecipeEntityToDto iRecipeEntityToDto, ICalculationRecipe iCalculationRecipe) {
         this.iRecipeDao = iRecipeDao;
         this.iProductDao = iProductDao;
         this.iRecipeEntityToDto = iRecipeEntityToDto;
+        this.iCalculationRecipe = iCalculationRecipe;
     }
 
     @Override
@@ -37,8 +42,10 @@ public class RecipeService implements IRecipeService {
         if (!iRecipeDao.existsByTitle(recipeCreate.getTitle())) {
             UUID uuid = UUID.randomUUID();
             LocalDateTime dt_create = LocalDateTime.now();
-            List<CompositionCompoundDto> compoundDtos = countCompositionCompoundCPFC(recipeCreate.getComposition(), uuid);
-            CompoundCPFCDto compoundCPFCDto = countCompoundCPFC(compoundDtos);
+            List<CompositionCompoundDto> compoundDtos =
+                    iCalculationRecipe.countCompositionCompoundCPFC(recipeCreate.getComposition(), uuid);
+            CompoundCPFCDto compoundCPFCDto =
+                    iCalculationRecipe.countCompoundCPFC(compoundDtos);
             iRecipeDao.save(new RecipeEntity(uuid, dt_create, dt_create,
                     recipeCreate.getTitle(),
                     compoundCPFCDto.getWeight(),
@@ -60,9 +67,6 @@ public class RecipeService implements IRecipeService {
             RecipeDto recipeDto = iRecipeEntityToDto.convertRecipeEntityToDto(entity);
             listDto.add(recipeDto);
         }
-//        for (RecipeEntity recipeEntity : recipeEntityPage) {
-//            listDto.add(conversionService.convert(recipeEntity, RecipeDto.class));
-//        }
         return new PageDto<>(recipeEntityPage.getNumber(), recipeEntityPage.getSize(),
                 recipeEntityPage.getTotalPages(), recipeEntityPage.getTotalElements(),
                 recipeEntityPage.isFirst(), recipeEntityPage.getNumberOfElements(),
@@ -75,7 +79,8 @@ public class RecipeService implements IRecipeService {
         RecipeEntity recipeEntity = findEntityUuid.get();
         if (recipeEntity != null) {
             if (recipeEntity.getDt_update().equals(dt_update) && recipeEntity.getUuid().equals(uuid)) {
-                CompoundCPFCDto recipeCPFCDto = countCompoundCPFC(countCompositionCompoundCPFC(recipeCreateDto.getComposition(), uuid));
+                CompoundCPFCDto recipeCPFCDto = iCalculationRecipe.countCompoundCPFC(
+                        iCalculationRecipe.countCompositionCompoundCPFC(recipeCreateDto.getComposition(), uuid));
                 recipeEntity.setTitle(recipeCreateDto.getTitle());
                 recipeEntity.setWeight(recipeCPFCDto.getWeight());
                 recipeEntity.setCalories(recipeCPFCDto.getCalories());
@@ -92,36 +97,36 @@ public class RecipeService implements IRecipeService {
         }
     }
 
-        private List<CompositionCompoundDto> countCompositionCompoundCPFC
-        (List < CompositionDto > compositionDtoList, UUID recipe){
-            List<CompositionCompoundDto> compoundDtoList = new ArrayList<>();
-            for (CompositionDto compositionDto : compositionDtoList) {
-                ProductEntity product = iProductDao.findByUuid(compositionDto.getUuidProduct());
-                int weight = compositionDto.getWeight();
-                double ratio = (double) weight / product.getWeight();
-                int calories = (int) (product.getCalories() * ratio);
-                double proteins = product.getProteins() * ratio;
-                double fats = product.getFats() * ratio;
-                double carbohydrates = product.getCarbohydrates() * ratio;
-                compoundDtoList.add(new CompositionCompoundDto(recipe, product.getUuid(), weight, calories, proteins, fats, carbohydrates));
-            }
-            return compoundDtoList;
-        }
+//    private List<CompositionCompoundDto> countCompositionCompoundCPFC
+//            (List<CompositionDto> compositionDtoList, UUID recipe) {
+//        List<CompositionCompoundDto> compoundDtoList = new ArrayList<>();
+//        for (CompositionDto compositionDto : compositionDtoList) {
+//            ProductEntity product = iProductDao.findByUuid(compositionDto.getUuidProduct());
+//            int weight = compositionDto.getWeight();
+//            double ratio = (double) weight / product.getWeight();
+//            int calories = (int) (product.getCalories() * ratio);
+//            double proteins = product.getProteins() * ratio;
+//            double fats = product.getFats() * ratio;
+//            double carbohydrates = product.getCarbohydrates() * ratio;
+//            compoundDtoList.add(new CompositionCompoundDto(recipe, product.getUuid(), weight, calories, proteins, fats, carbohydrates));
+//        }
+//        return compoundDtoList;
+//    }
+//
+//    private CompoundCPFCDto countCompoundCPFC(List<CompositionCompoundDto> compositionCompoundDtos) {
+//        int weight = 0;
+//        int calories = 0;
+//        double proteins = 0.00;
+//        double fats = 0.00;
+//        double carbohydrates = 0.00;
+//        for (CompositionCompoundDto dto : compositionCompoundDtos) {
+//            weight = weight + dto.getWeight();
+//            calories = calories + dto.getCalories();
+//            proteins = proteins + dto.getProteins();
+//            fats = fats + dto.getFats();
+//            carbohydrates = carbohydrates + dto.getCarbohydrates();
+//        }
+//        return new CompoundCPFCDto(weight, calories, proteins, fats, carbohydrates);
+//    }
 
-        private CompoundCPFCDto countCompoundCPFC (List < CompositionCompoundDto > compositionCompoundDtos) {
-            int weight = 0;
-            int calories = 0;
-            double proteins = 0.00;
-            double fats = 0.00;
-            double carbohydrates = 0.00;
-            for (CompositionCompoundDto dto : compositionCompoundDtos) {
-                weight = weight + dto.getWeight();
-                calories = calories + dto.getCalories();
-                proteins = proteins + dto.getProteins();
-                fats = fats + dto.getFats();
-                carbohydrates = carbohydrates + dto.getCarbohydrates();
-            }
-            return new CompoundCPFCDto(weight, calories, proteins, fats, carbohydrates);
-        }
-
-    }
+}

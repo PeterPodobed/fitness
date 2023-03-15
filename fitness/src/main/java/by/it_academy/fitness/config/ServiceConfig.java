@@ -13,15 +13,16 @@ import by.it_academy.fitness.service.products.ProductService;
 import by.it_academy.fitness.service.products.RecipeService;
 import by.it_academy.fitness.service.products.api.IProductService;
 import by.it_academy.fitness.service.products.api.IRecipeService;
+import by.it_academy.fitness.service.products.dataCalculation.ICalculationRecipe;
 import by.it_academy.fitness.service.users.AdminService;
 import by.it_academy.fitness.service.users.UserService;
 import by.it_academy.fitness.service.users.api.IAdminService;
 import by.it_academy.fitness.service.users.api.IUserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-//import org.springframework.core.convert.ConversionService;
-//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-//import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 
 @Configuration
 public class ServiceConfig {
@@ -48,14 +49,15 @@ public class ServiceConfig {
     @Bean
     public IRecipeService recipeService (IRecipeDao iRecipeDao,
                                          IProductDao iProductDao,
-                                         IRecipeEntityToDto iRecipeEntityToDto){
-        return new RecipeService(iRecipeDao, iProductDao, iRecipeEntityToDto);
+                                         IRecipeEntityToDto iRecipeEntityToDto,
+                                         ICalculationRecipe iCalculationRecipe){
+        return new RecipeService(iRecipeDao, iProductDao, iRecipeEntityToDto, iCalculationRecipe);
     }
 
-//    @Bean
-//    public PasswordEncoder passwordEncoder() {
-//        return new BCryptPasswordEncoder();
-//    }
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
 
 

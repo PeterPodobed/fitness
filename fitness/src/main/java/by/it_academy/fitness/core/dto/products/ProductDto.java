@@ -1,6 +1,10 @@
 package by.it_academy.fitness.core.dto.products;
 
 
+import by.it_academy.fitness.core.exception.MultipleErrorResponse;
+import by.it_academy.fitness.core.exception.validationProducts.ProductCreateTitleValid;
+import by.it_academy.fitness.core.exception.validationProducts.ProductCreateValid;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -17,7 +21,7 @@ public class ProductDto {
 
     public ProductDto(UUID uuid, LocalDateTime dt_create, LocalDateTime dt_update,
                       String title, int weight, int calories, double proteins,
-                      double fats, double carbohydrates) {
+                      double fats, double carbohydrates) throws MultipleErrorResponse {
         this.uuid = uuid;
         this.dt_create = dt_create;
         this.dt_update = dt_update;
@@ -27,6 +31,20 @@ public class ProductDto {
         this.proteins = proteins;
         this.fats = fats;
         this.carbohydrates = carbohydrates;
+        validate();
+    }
+
+    public void validate() throws MultipleErrorResponse {
+        MultipleErrorResponse errorResponse = new MultipleErrorResponse("Данные отсутствуют");
+        ProductCreateTitleValid.validate(errorResponse, this.title);
+        ProductCreateValid.validate(errorResponse, Integer.toString(this.weight));
+        ProductCreateValid.validate(errorResponse, Integer.toString(this.calories));
+        ProductCreateValid.validate(errorResponse, Double.toString(this.proteins));
+        ProductCreateValid.validate(errorResponse, Double.toString(this.fats));
+        ProductCreateValid.validate(errorResponse, Double.toString(this.carbohydrates));
+        if (!errorResponse.getErrors().isEmpty()) {
+            throw errorResponse;
+        }
     }
 
     public UUID getUuid() {

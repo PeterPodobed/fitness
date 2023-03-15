@@ -2,6 +2,7 @@ package by.it_academy.fitness.service.convertion.recipe;
 
 import by.it_academy.fitness.core.dto.products.ProductDto;
 import by.it_academy.fitness.core.dto.products.RecipeDto;
+import by.it_academy.fitness.core.exception.MultipleErrorResponse;
 import by.it_academy.fitness.dao.entity.products.ProductEntity;
 import by.it_academy.fitness.dao.entity.products.RecipeEntity;
 import by.it_academy.fitness.service.convertion.products.api.IProductEntityToDto;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class RecipeEntityToDto implements IRecipeEntityToDto {
     @Override
-    public RecipeDto convertRecipeEntityToDto(RecipeEntity recipeEntity) {
+    public RecipeDto convertRecipeEntityToDto(RecipeEntity recipeEntity) throws MultipleErrorResponse {
         return new RecipeDto(recipeEntity.getUuid(),
                 recipeEntity.getDt_create(),
                 recipeEntity.getDt_update(),

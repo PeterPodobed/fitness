@@ -3,6 +3,7 @@ package by.it_academy.fitness.service.products;
 import by.it_academy.fitness.core.dto.PageDto;
 import by.it_academy.fitness.core.dto.products.ProductCreateDto;
 import by.it_academy.fitness.core.dto.products.ProductDto;
+import by.it_academy.fitness.core.exception.MultipleErrorResponse;
 import by.it_academy.fitness.core.exception.UserMessage;
 import by.it_academy.fitness.dao.api.IProductDao;
 import by.it_academy.fitness.dao.entity.products.ProductEntity;
@@ -66,7 +67,7 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public PageDto<ProductDto> getPage(int number, int size) {
+    public PageDto<ProductDto> getPage(int number, int size) throws MultipleErrorResponse {
         Pageable page = PageRequest.of(number, size);
         Page<ProductEntity> productEntityPage = iProductDao.findAll(page);
         List<ProductDto> listDto = new ArrayList<>();
