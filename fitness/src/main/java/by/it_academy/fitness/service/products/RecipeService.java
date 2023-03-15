@@ -2,6 +2,7 @@ package by.it_academy.fitness.service.products;
 
 import by.it_academy.fitness.core.dto.PageDto;
 import by.it_academy.fitness.core.dto.products.*;
+import by.it_academy.fitness.core.exception.MultipleErrorResponse;
 import by.it_academy.fitness.core.exception.SingleErrorResponse;
 import by.it_academy.fitness.dao.api.IProductDao;
 import by.it_academy.fitness.dao.api.IRecipeDao;
@@ -59,7 +60,7 @@ public class RecipeService implements IRecipeService {
     }
 
     @Override
-    public PageDto<RecipeDto> getPage(int number, int size) {
+    public PageDto<RecipeDto> getPage(int number, int size) throws MultipleErrorResponse {
         Pageable page = PageRequest.of(number, size);
         Page<RecipeEntity> recipeEntityPage = iRecipeDao.findAll(page);
         List<RecipeDto> listDto = new ArrayList<>();
