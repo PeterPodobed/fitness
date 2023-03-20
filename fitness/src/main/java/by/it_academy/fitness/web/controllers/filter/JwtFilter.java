@@ -7,8 +7,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -22,10 +26,10 @@ import static org.apache.logging.log4j.util.Strings.isEmpty;
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
-    private final UserDetailsManager userManager;
+    private final UserDetailsService userService;
 
-    public JwtFilter(UserDetailsManager userManager) {
-        this.userManager = userManager;
+    public JwtFilter(UserDetailsService userService) {
+        this.userService = userService;
     }
 
     @Override
@@ -34,35 +38,42 @@ public class JwtFilter extends OncePerRequestFilter {
                                     FilterChain chain)
             throws ServletException, IOException {
 
-        final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (isEmpty(header) || !header.startsWith("Bearer ")) {
+        final String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (isEmpty(authorizationHeader) || !authorizationHeader.startsWith("Bearer ")) {
             chain.doFilter(request, response);
             return;
         }
 
-        // Get jwt token and validate
-        final String token = header.split(" ")[1].trim();
+        final String token = authorizationHeader.split(" ")[1].trim();
         if (!JwtTokenUtil.validate(token)) {
             chain.doFilter(request, response);
             return;
         }
 
-        // Get user identity and set it on the spring security context
-        UserDetails userDetails = userManager
-                .loadUserByUsername(JwtTokenUtil.getUsername(token));
+        String jwt = null;
+        UserDetails userModel = null;
 
-        UsernamePasswordAuthenticationToken
-                authentication = new UsernamePasswordAuthenticationToken(
-                userDetails, null,
-                userDetails == null ?
-                        List.of() : userDetails.getAuthorities()
-        );
+        try {
+            userModel = userService.loadUserByUsername(JwtTokenUtil.getUsername(token));
+        } catch (UsernameNotFoundException e) {
+            chain.doFilter(request, response);
+            return;
+        }
 
-        authentication.setDetails(
-                new WebAuthenticationDetailsSource().buildDetails(request)
-        );
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            jwt = authorizationHeader.substring(7);
+        }
+        if (userModel != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+
+            String commaSeparatedListOfAuthorities = JwtTokenUtil.extractAuthorities(jwt);
+            List<GrantedAuthority> authorities = AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_" + commaSeparatedListOfAuthorities);
+            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+                    new UsernamePasswordAuthenticationToken(
+                            userModel, null, authorities);
+
+            SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+        }
         chain.doFilter(request, response);
-    }
-}
+    }}

@@ -23,16 +23,14 @@ public class SecurityConfig {
 
     @Bean
     protected SecurityFilterChain configure(HttpSecurity http) throws Exception {
-        // Enable CORS and disable CSRF
+
         http = http.cors().and().csrf().disable();
 
-        // Set session management to stateless
         http = http
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and();
 
-        // Set unauthorized requests exception handler
         http = http
                 .exceptionHandling()
                 .authenticationEntryPoint(
@@ -45,21 +43,22 @@ public class SecurityConfig {
                 )
                 .and();
 
-        // Set permissions on endpoints
         http.authorizeHttpRequests((requests) -> requests
                 .requestMatchers("/**").permitAll()
-                .requestMatchers("/api/v1/users").permitAll()
                 .requestMatchers("/api/v1/users/registration").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/users/me").authenticated()
-                .requestMatchers("/api/v1/users/").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.GET, "/api/v1/users/verification").authenticated()
+                .requestMatchers("/api/v1/users/verification").permitAll()
+                .requestMatchers("/api/v1/users/login").permitAll()
+                .requestMatchers(HttpMethod.GET,"/api/v1/users/me").authenticated()
+                .requestMatchers("/api/v1/users/").authenticated()
+                .requestMatchers("/api/v1/users").authenticated()
+//                .requestMatchers("/api/v1/users/").hasRole("ADMIN")
+//                .requestMatchers("/api/v1/users").hasRole("ADMIN")
                 .requestMatchers("/api/v1/product").hasRole("ADMIN")
                 .requestMatchers("/api/v1/product/").hasRole("ADMIN")
                 .requestMatchers("/api/v1/recipe").hasRole("ADMIN")
                 .requestMatchers("/api/v1/recipe/").hasRole("ADMIN"));
 
 
-        // Add JWT token filter
         http.addFilterBefore(
                 filter,
                 UsernamePasswordAuthenticationFilter.class

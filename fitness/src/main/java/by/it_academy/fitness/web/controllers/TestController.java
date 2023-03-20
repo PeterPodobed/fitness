@@ -10,20 +10,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/user")
 public class TestController {
 
-    private UserHolder holder;
-
-    public TestController(UserHolder holder) {
-        this.holder = holder;
-    }
-
-    @RequestMapping(value = "/test", method = RequestMethod.GET)
-    public String test(){
-        return "user";
-    }
-
-
-    @RequestMapping(value = "/details")
-    public UserDetails details(){
-        return holder.getUser();
-    }
+//    private UserHolder holder;
+//
+//    public TestController(UserHolder holder) {
+//        this.holder = holder;
+//    }
+//
+//    @RequestMapping(value = "/test", method = RequestMethod.GET)
+//    public String test(){
+//        return "user";
+//    }
+//
+//
+//    @RequestMapping(value = "/details")
+//    public UserDetails details(){
+//        return holder.getUser();
+//    }
 }

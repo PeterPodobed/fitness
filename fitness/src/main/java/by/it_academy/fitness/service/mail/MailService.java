@@ -9,16 +9,17 @@ import org.springframework.mail.javamail.JavaMailSender;
 
 public class MailService implements MailSender {
     private final EmailSender emailSender = new EmailSender();
-
     private final JavaMailSender javaMailSender = emailSender.javaMailSender();
+    private String MAIL_SENDER ="i_ivanov_01_01_1980@mail.ru";
+
 
     public void sendSimpleMessage(String to, String subject, String message) {
 
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
-        simpleMailMessage.setFrom("nomatut123@gmail.com");
-        simpleMailMessage.setTo(to);
+        simpleMailMessage.setFrom(MAIL_SENDER);
+        simpleMailMessage.setTo(MAIL_SENDER);
         simpleMailMessage.setSubject(subject);
-        simpleMailMessage.setText(message);
+        simpleMailMessage.setText("http://localhost:8080/api/v1/users/verification?code=" + message + "&mail=" + to);
         javaMailSender.send(simpleMailMessage);
 
     }

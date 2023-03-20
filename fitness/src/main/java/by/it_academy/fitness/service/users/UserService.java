@@ -2,16 +2,13 @@ package by.it_academy.fitness.service.users;
 
 
 import by.it_academy.fitness.core.dto.PageDto;
-import by.it_academy.fitness.core.dto.users.UserCreateDto;
-import by.it_academy.fitness.core.dto.users.UserDto;
-import by.it_academy.fitness.core.dto.users.UserLoginDto;
+import by.it_academy.fitness.core.dto.users.*;
 import by.it_academy.fitness.core.dto.users.enums.UserStatus;
 import by.it_academy.fitness.core.exception.MultipleErrorResponse;
 import by.it_academy.fitness.core.exception.SingleErrorResponse;
 import by.it_academy.fitness.core.exception.UserMessage;
 import by.it_academy.fitness.dao.api.IUserDao;
 import by.it_academy.fitness.dao.entity.users.UserEntity;
-import by.it_academy.fitness.core.dto.users.UserRegistrationDto;
 
 import by.it_academy.fitness.dao.entity.users.UserRoleEntity;
 import by.it_academy.fitness.dao.entity.users.UserStatusEntity;
@@ -19,28 +16,35 @@ import by.it_academy.fitness.service.convertion.users.IDtoToUserEntity;
 import by.it_academy.fitness.service.convertion.users.IUserEntityToDto;
 import by.it_academy.fitness.service.mail.MailService;
 import by.it_academy.fitness.service.users.api.IUserService;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.UserDetailsManager;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 //@Service
 public class UserService implements IUserService {
 
     private final IUserDao iUserDao;
     private final IUserEntityToDto iUserEntityToDto;
-
+    private final PasswordEncoder encoder;
+    private final UserDetailsManager userManager;
     private final IDtoToUserEntity iDtoToUserEntity;
+    private final ConversionService conversionService;
 
-    public UserService(IUserDao iUserDao, IUserEntityToDto iUserEntityToDto, IDtoToUserEntity iDtoToUserEntity) {
+    public UserService(IUserDao iUserDao, IUserEntityToDto iUserEntityToDto, PasswordEncoder encoder,
+                       UserDetailsManager userManager, IDtoToUserEntity iDtoToUserEntity,
+                       ConversionService conversionService) {
         this.iUserDao = iUserDao;
         this.iUserEntityToDto = iUserEntityToDto;
+        this.encoder = encoder;
+        this.userManager = userManager;
         this.iDtoToUserEntity = iDtoToUserEntity;
+        this.conversionService = conversionService;
     }
 
     @Override
@@ -56,21 +60,23 @@ public class UserService implements IUserService {
         Optional<UserEntity> userEntity = iUserDao.findByMail(userRegistration.getMail());
         if (userEntity.isEmpty()) {
             UserEntity entity = iDtoToUserEntity.convertDtoToEntityByUser(userRegistration);
+            mailService.sendSimpleMessage(entity.getMail(), "Verification code", entity.getVerificationCode());
             iUserDao.save(entity);
-//        mailService.sendSimpleMessage(entity.getMail(), "Verification code", entity.getVerificationCode());
             return true;
         } else throw new UserMessage("Пользователь с таким email уже зарегистрирован");
 
     }
 
     @Override
-    public UserLoginDto login(UserLoginDto userLoginDto) {
+    public UserDetailsDto login(UserLoginDto userLoginDto) {
         UserEntity userEntity = findMail(userLoginDto.getMail());
-        if (userEntity.getMail().equals(userLoginDto.getMail()) && userEntity.getPassword().equals(userLoginDto.getPassword())) {
-            throw new UserMessage("Вход выполнен");
-        } else {
-            throw new UserMessage("Пользователь отсутствует или введены некорректные данные");
+        if (userEntity == null) {
+            throw new UserMessage("Пользователь отсутствует");
         }
+        if(!encoder.matches(userLoginDto.getPassword(), userEntity.getPassword())){
+            throw new UserMessage("Введите правильный пароль");
+        }
+        return iUserEntityToDto.convertUserEntityToDtoDetails(userEntity);
     }
 
     @Override

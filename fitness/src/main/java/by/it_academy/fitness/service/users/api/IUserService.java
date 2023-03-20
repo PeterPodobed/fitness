@@ -2,12 +2,10 @@ package by.it_academy.fitness.service.users.api;
 
 
 import by.it_academy.fitness.core.dto.PageDto;
-import by.it_academy.fitness.core.dto.users.UserCreateDto;
-import by.it_academy.fitness.core.dto.users.UserDto;
-import by.it_academy.fitness.core.dto.users.UserLoginDto;
-import by.it_academy.fitness.core.dto.users.UserRegistrationDto;
+import by.it_academy.fitness.core.dto.users.*;
 import by.it_academy.fitness.core.exception.MultipleErrorResponse;
 import by.it_academy.fitness.core.exception.SingleErrorResponse;
+import org.springframework.security.core.userdetails.UserDetails;
 
 
 import java.time.LocalDateTime;
@@ -19,7 +17,7 @@ public interface IUserService {
 
     boolean create(UserRegistrationDto userRegistration);
 
-    UserLoginDto login (UserLoginDto userLoginDto);
+    UserDetailsDto login (UserLoginDto userLoginDto);
 
     void verification(String verificationCode, String mail);
 

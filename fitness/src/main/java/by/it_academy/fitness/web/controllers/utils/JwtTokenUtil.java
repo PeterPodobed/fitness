@@ -1,10 +1,18 @@
 package by.it_academy.fitness.web.controllers.utils;
 
+import by.it_academy.fitness.core.dto.users.UserDetailsDto;
+import by.it_academy.fitness.core.dto.users.UserDto;
 import io.jsonwebtoken.*;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 public class JwtTokenUtil {
 
@@ -12,27 +20,63 @@ public class JwtTokenUtil {
     private static final String jwtIssuer = "ITAcademy";
 
 
-    public static String generateAccessToken(UserDetails user) {
-        return generateAccessToken(user.getUsername());
+    public static String generateAccessToken(UserDetailsDto user) {
+        return generateAccessToken(new HashMap<>(), user);
     }
 
-    public static String generateAccessToken(String name) {
+    public static String generateAccessToken(Map<String, Object> claims, UserDetailsDto user) {
         return Jwts.builder()
-                .setSubject(name)
+                .setClaims(claims)
+                .setSubject(user.getMail())
                 .setIssuer(jwtIssuer)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(7))) // 1 week
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .setExpiration(new Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(30))) // 30 days
+                .signWith(SignatureAlgorithm.HS256, jwtSecret)
                 .compact();
     }
 
-    public static String getUsername(String token) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(jwtSecret)
-                .parseClaimsJws(token)
-                .getBody();
+    public Map<String, Object> getClaim(UserDetailsDto user){
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("uuid", user.getUuid());
+        claims.put("fio", user.getFio());
+        claims.put("date create user",user.getDt_create().toString());
+        claims.put("date update user", user.getDt_update().toString());
+        claims.put("role", user.getRole());
+        claims.put("status", user.getStatus());
+        return claims;
+    }
 
-        return claims.getSubject();
+    public static String getUsername(String token) {
+//        Claims claims = Jwts.parser()
+//                .setSigningKey(jwtSecret)
+//                .parseClaimsJws(token)
+//                .getBody();
+//
+//        return claims.getSubject();
+        return extractClaim(token, Claims::getSubject);
+    }
+
+//    public static UUID getUuid(String token) {
+//        Claims claims = Jwts.parser()
+//                .setSigningKey(jwtSecret)
+//                .parseClaimsJws(token)
+//                .getBody();
+//        return claims.get("uuid", UUID);
+//    }
+
+
+    private static  <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
+
+    private static Claims extractAllClaims(String token) {
+        return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
+    }
+
+    public  static String extractAuthorities(String token) {
+        Function<Claims, String> claimsListFunction = claims -> (String)claims.get("authorities");
+        return extractClaim(token, claimsListFunction);
     }
 
     public static Date getExpirationDate(String token) {

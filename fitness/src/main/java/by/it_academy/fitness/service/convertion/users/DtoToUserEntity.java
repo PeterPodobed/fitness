@@ -7,6 +7,7 @@ import by.it_academy.fitness.core.dto.users.enums.UserStatus;
 import by.it_academy.fitness.dao.entity.users.UserEntity;
 import by.it_academy.fitness.dao.entity.users.UserRoleEntity;
 import by.it_academy.fitness.dao.entity.users.UserStatusEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -14,10 +15,15 @@ import java.util.UUID;
 
 @Component
 public class DtoToUserEntity implements IDtoToUserEntity {
+    private PasswordEncoder encoder;
 
+    public DtoToUserEntity(PasswordEncoder encoder) {
+        this.encoder = encoder;
+    }
 
     public UserEntity convertDtoToEntityByUser(UserRegistrationDto userRegistrationDTO) {
         int code = (int)(Math.random() * 10000);
+        String encode = encoder.encode(userRegistrationDTO.getPassword());
         return new UserEntity(UUID.randomUUID(),
                 LocalDateTime.now(),
                 LocalDateTime.now(),
@@ -26,7 +32,7 @@ public class DtoToUserEntity implements IDtoToUserEntity {
                 new UserRoleEntity(UserRole.USER),
                 new UserStatusEntity(UserStatus.WAITING_ACTIVATION),
                 Integer.toString(code),
-                userRegistrationDTO.getPassword()
+                encode
         );
     }
 
