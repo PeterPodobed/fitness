@@ -35,12 +35,16 @@ public class SecurityConfig {
                 .exceptionHandling()
                 .authenticationEntryPoint(
                         (request, response, ex) -> {
-                            response.sendError(
-                                    HttpServletResponse.SC_UNAUTHORIZED,
-                                    ex.getMessage()
+                            response.setStatus(
+                                    HttpServletResponse.SC_UNAUTHORIZED
                             );
                         }
                 )
+                .accessDeniedHandler((request, response, ex) -> {
+                    response.setStatus(
+                            HttpServletResponse.SC_FORBIDDEN
+                    );
+                })
                 .and();
 
         http.authorizeHttpRequests((requests) -> requests
@@ -48,7 +52,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/users/registration").permitAll()
                 .requestMatchers("/api/v1/users/verification").permitAll()
                 .requestMatchers("/api/v1/users/login").permitAll()
-                .requestMatchers(HttpMethod.GET,"/api/v1/users/me").authenticated()
+                .requestMatchers(HttpMethod.GET, "/api/v1/users/me").authenticated()
                 .requestMatchers("/api/v1/users/").authenticated()
                 .requestMatchers("/api/v1/users").authenticated()
 //                .requestMatchers("/api/v1/users/").hasRole("ADMIN")

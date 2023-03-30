@@ -34,6 +34,9 @@ public class ProductDto {
         validate();
     }
 
+    public ProductDto() {
+    }
+
     public void validate() throws MultipleErrorResponse {
         MultipleErrorResponse errorResponse = new MultipleErrorResponse("Данные отсутствуют");
         ProductCreateTitleValid.validate(errorResponse, this.title);

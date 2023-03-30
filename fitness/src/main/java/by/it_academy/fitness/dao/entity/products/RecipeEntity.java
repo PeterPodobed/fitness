@@ -1,6 +1,7 @@
 package by.it_academy.fitness.dao.entity.products;
 
 import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -26,8 +27,8 @@ public class RecipeEntity {
     @ManyToMany(cascade = CascadeType.MERGE)
     @JoinTable(
             schema = "public", name = "recipe_composition",
-            joinColumns = @JoinColumn( name = "recipe_uuid"),
-            inverseJoinColumns= @JoinColumn(name="composition_uuid")
+            joinColumns = @JoinColumn(name = "recipe_uuid"),
+            inverseJoinColumns = @JoinColumn(name = "composition_uuid")
     )
     private List<CompositionEntity> composition;
 
@@ -47,8 +48,17 @@ public class RecipeEntity {
     private double carbohydrates;
 
     public RecipeEntity(UUID uuid, LocalDateTime dt_create, LocalDateTime dt_update, String title,
-                        List<CompositionEntity> composition, double weight, double calories, double proteins,
-                        double fats, double carbohydrates) {
+                        List<CompositionEntity> composition) {
+        this.uuid = uuid;
+        this.dt_create = dt_create;
+        this.dt_update = dt_update;
+        this.title = title;
+        this.composition = composition;
+    }
+
+    public RecipeEntity(UUID uuid, LocalDateTime dt_create, LocalDateTime dt_update, String title,
+                        List<CompositionEntity> composition, double weight, double calories,
+                        double proteins, double fats, double carbohydrates) {
         this.uuid = uuid;
         this.dt_create = dt_create;
         this.dt_update = dt_update;
@@ -156,7 +166,6 @@ public class RecipeEntity {
     public void setCarbohydrates(double carbohydrates) {
         this.carbohydrates = carbohydrates;
     }
-
 
 
     @Override

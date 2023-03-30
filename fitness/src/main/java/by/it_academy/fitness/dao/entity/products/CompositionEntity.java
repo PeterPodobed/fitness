@@ -24,9 +24,8 @@ public class CompositionEntity {
         this.weight = weight;
     }
 
-    public CompositionEntity(ProductEntity productEntity, int weight) {
+    public CompositionEntity(ProductEntity productEntity) {
         this.productEntity = productEntity;
-        this.weight = weight;
     }
 
     public CompositionEntity() {

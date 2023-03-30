@@ -58,8 +58,9 @@ public class ServiceConfig {
     public IRecipeService recipeService (IRecipeDao iRecipeDao,
                                          IProductDao iProductDao,
                                          IRecipeEntityToDto iRecipeEntityToDto,
-                                         ICalculationRecipe iCalculationRecipe){
-        return new RecipeService(iRecipeDao, iProductDao, iRecipeEntityToDto, iCalculationRecipe);
+                                         ICalculationRecipe iCalculationRecipe,
+                                         IProductService iProductService){
+        return new RecipeService(iRecipeDao, iProductDao, iRecipeEntityToDto, iCalculationRecipe, iProductService);
     }
 
     @Bean

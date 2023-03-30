@@ -51,17 +51,17 @@ public class ProductService implements IProductService {
         if (productEntity.isEmpty()) {
             ProductEntity entity = iDtoToProductEntity.convertDtoToProductEntity(productCreateDTO);
             iProductDao.save(entity);
-            UserHolder userHolder = new UserHolder();
-            UUID uuid = userHolder.getUser().getUuid();
+//            UserHolder userHolder = new UserHolder();
+//            UUID uuid = userHolder.getUser().getUuid();
 //            String mail = iUserDao.findByMail(JwtTokenUtil.getUsername())
-                    AuditDto auditDto = new AuditDto(
-                    UUID.randomUUID(),
-                    LocalDateTime.now(),
-                    uuid,
-                    "Создан новый продукт",
-                    type,
-                    "id");
-            iAuditService.createReport(auditDto);
+//                    AuditDto auditDto = new AuditDto(
+//                    UUID.randomUUID(),
+//                    LocalDateTime.now(),
+//                    uuid,
+//                    "Создан новый продукт",
+//                    type,
+//                    "id");
+//            iAuditService.createReport(auditDto);
             return true;
         } else throw new UserMessage("Продукт с таким названием уже зарегистрирован");
     }
