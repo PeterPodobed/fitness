@@ -1,0 +1,2 @@
+--INSERT INTO public.user(uuid, dt_create, dt_update, mail, fio, role, status, password)
+--	VALUES (gen_random_uuid (), now(), now(), 'admin@admin.ru', 'Admin', 'ADMIN', 'ACTIVATED', '1234567890qwerty');

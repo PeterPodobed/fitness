@@ -42,7 +42,8 @@ public class ServiceConfig {
                                      UserDetailsManager userManager,
                                      IDtoToUserEntity iDtoToUserEntity,
                                      ConversionService conversionService) {
-        return new UserService(iUserDao, iUserEntityToDto, encoder, userManager, iDtoToUserEntity, conversionService);
+        return new UserService(iUserDao, iUserEntityToDto, encoder, userManager,
+                iDtoToUserEntity, conversionService);
     }
 
     @Bean

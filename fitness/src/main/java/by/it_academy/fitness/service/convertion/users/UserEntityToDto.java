@@ -34,4 +34,14 @@ public class UserEntityToDto implements IUserEntityToDto {
                 userEntity.getPassword()
         );
     }
+
+    @Override
+    public UserDto convertUserEntityToDtoToken(UserEntity userEntity) throws MultipleErrorResponse {
+        return new UserDto(userEntity.getUuid(),
+                userEntity.getDtCreate(),
+                userEntity.getDtUpdate(),
+                userEntity.getFio(),
+                userEntity.getRole().getRole(),
+                userEntity.getStatus().getStatus()
+        );    }
 }

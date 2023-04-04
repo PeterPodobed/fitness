@@ -13,4 +13,6 @@ public interface IUserEntityToDto {
 
     UserDetailsDto convertUserEntityToDtoDetails(UserEntity userEntity);
 
+    UserDto convertUserEntityToDtoToken (UserEntity userEntity) throws MultipleErrorResponse;
+
 }

@@ -33,6 +33,16 @@ public class UserDto {
         validate();
     }
 
+    public UserDto(UUID uuid, LocalDateTime dt_create, LocalDateTime dt_update,
+                   String fio, UserRole role, UserStatus status) {
+        this.uuid = uuid;
+        this.dt_create = dt_create;
+        this.dt_update = dt_update;
+        this.fio = fio;
+        this.role = role;
+        this.status = status;
+    }
+
     public UUID getUuid() {
         return uuid;
     }

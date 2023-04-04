@@ -7,6 +7,7 @@ import by.it_academy.fitness.core.dto.users.enums.UserStatus;
 import by.it_academy.fitness.core.exception.MultipleErrorResponse;
 import by.it_academy.fitness.core.exception.SingleErrorResponse;
 import by.it_academy.fitness.core.exception.UserMessage;
+import by.it_academy.fitness.dao.api.IAuditDao;
 import by.it_academy.fitness.dao.api.IUserDao;
 import by.it_academy.fitness.dao.entity.users.UserEntity;
 
@@ -36,8 +37,9 @@ public class UserService implements IUserService {
     private final IDtoToUserEntity iDtoToUserEntity;
     private final ConversionService conversionService;
 
-    public UserService(IUserDao iUserDao, IUserEntityToDto iUserEntityToDto, PasswordEncoder encoder,
-                       UserDetailsManager userManager, IDtoToUserEntity iDtoToUserEntity,
+
+    public UserService(IUserDao iUserDao, IUserEntityToDto iUserEntityToDto,
+                       PasswordEncoder encoder, UserDetailsManager userManager, IDtoToUserEntity iDtoToUserEntity,
                        ConversionService conversionService) {
         this.iUserDao = iUserDao;
         this.iUserEntityToDto = iUserEntityToDto;
@@ -73,7 +75,7 @@ public class UserService implements IUserService {
         if (userEntity == null) {
             throw new UserMessage("Пользователь отсутствует");
         }
-        if(!encoder.matches(userLoginDto.getPassword(), userEntity.getPassword())){
+        if (!encoder.matches(userLoginDto.getPassword(), userEntity.getPassword())) {
             throw new UserMessage("Введите правильный пароль");
         }
         return iUserEntityToDto.convertUserEntityToDtoDetails(userEntity);
@@ -118,8 +120,6 @@ public class UserService implements IUserService {
         } else {
             throw new SingleErrorResponse("error", "Пользователь уже обновлен");
         }
-
-
     }
 
     @Override
@@ -134,4 +134,9 @@ public class UserService implements IUserService {
                 .orElseThrow(() -> new RuntimeException("Пользователь с таким email не зарегистрирован"));
     }
 
+    @Override
+    public UserDto findUserByMail(String mail) throws MultipleErrorResponse {
+        UserEntity user = iUserDao.findByMail(mail).get();
+        return iUserEntityToDto.convertUserEntityToDto(user);
+    }
 }

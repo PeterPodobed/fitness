@@ -1,5 +1,8 @@
 package by.it_academy.fitness.web.controllers.filter;
 
+import by.it_academy.fitness.core.dto.users.UserDto;
+import by.it_academy.fitness.core.exception.MultipleErrorResponse;
+import by.it_academy.fitness.service.users.api.IUserService;
 import by.it_academy.fitness.web.controllers.utils.JwtTokenUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -27,9 +30,14 @@ import static org.apache.logging.log4j.util.Strings.isEmpty;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final UserDetailsService userService;
+    private final JwtTokenUtil jwtTokenUtil;
+    private final IUserService iUserService;
 
-    public JwtFilter(UserDetailsService userService) {
+
+    public JwtFilter(UserDetailsService userService, JwtTokenUtil jwtTokenUtil, IUserService iUserService) {
         this.userService = userService;
+        this.jwtTokenUtil = jwtTokenUtil;
+        this.iUserService = iUserService;
     }
 
     @Override
@@ -38,31 +46,33 @@ public class JwtFilter extends OncePerRequestFilter {
                                     FilterChain chain)
             throws ServletException, IOException {
 
-        final String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (isEmpty(authorizationHeader) || !authorizationHeader.startsWith("Bearer ")) {
+        final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (isEmpty(header) || !header.startsWith("Bearer ")) {
             chain.doFilter(request, response);
             return;
         }
 
-        final String token = authorizationHeader.split(" ")[1].trim();
-        if (!JwtTokenUtil.validate(token)) {
+        final String token = header.split(" ")[1].trim();
+        if (!jwtTokenUtil.validate(token)) {
             chain.doFilter(request, response);
             return;
         }
 
         String jwt = null;
-        UserDetails userModel = null;
+        UserDto userModel = null;
 
         try {
-            userModel = userService.loadUserByUsername(JwtTokenUtil.getUsername(token));
+            userModel = iUserService.findUserByMail(JwtTokenUtil.getUsername(token));
         } catch (UsernameNotFoundException e) {
             chain.doFilter(request, response);
             return;
+        } catch (MultipleErrorResponse e) {
+            throw new RuntimeException(e);
         }
 
 
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            jwt = authorizationHeader.substring(7);
+        if (header != null && header.startsWith("Bearer ")) {
+            jwt = header.substring(7);
         }
         if (userModel != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 

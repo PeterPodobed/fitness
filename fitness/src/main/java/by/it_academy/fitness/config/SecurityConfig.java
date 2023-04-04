@@ -48,15 +48,13 @@ public class SecurityConfig {
                 .and();
 
         http.authorizeHttpRequests((requests) -> requests
-                .requestMatchers("/**").permitAll()
+//                .requestMatchers("/**").permitAll()
                 .requestMatchers("/api/v1/users/registration").permitAll()
                 .requestMatchers("/api/v1/users/verification").permitAll()
                 .requestMatchers("/api/v1/users/login").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/users/me").authenticated()
-                .requestMatchers("/api/v1/users/").authenticated()
-                .requestMatchers("/api/v1/users").authenticated()
-//                .requestMatchers("/api/v1/users/").hasRole("ADMIN")
-//                .requestMatchers("/api/v1/users").hasRole("ADMIN")
+                .requestMatchers("/api/v1/users/me").authenticated()
+                .requestMatchers("/api/v1/users/").hasRole("ADMIN")
+                .requestMatchers("/api/v1/users").hasRole("ADMIN")
                 .requestMatchers("/api/v1/product").hasRole("ADMIN")
                 .requestMatchers("/api/v1/product/").hasRole("ADMIN")
                 .requestMatchers("/api/v1/recipe").hasRole("ADMIN")

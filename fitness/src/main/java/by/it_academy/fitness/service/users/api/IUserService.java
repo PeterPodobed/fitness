@@ -27,4 +27,6 @@ public interface IUserService {
 
     UserDto get(UUID uuid) throws MultipleErrorResponse;
 
+    UserDto findUserByMail (String mail) throws MultipleErrorResponse;
+
 }

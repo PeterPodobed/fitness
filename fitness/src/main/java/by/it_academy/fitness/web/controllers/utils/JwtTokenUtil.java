@@ -47,14 +47,22 @@ public class JwtTokenUtil {
     }
 
     public static String getUsername(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(jwtSecret)
+                .parseClaimsJws(token)
+                .getBody();
+        return claims.getSubject();
+//        return extractClaim(token, Claims::getSubject);
+    }
+
+//    public String getUserMail(String token) {
 //        Claims claims = Jwts.parser()
 //                .setSigningKey(jwtSecret)
 //                .parseClaimsJws(token)
 //                .getBody();
 //
-//        return claims.getSubject();
-        return extractClaim(token, Claims::getSubject);
-    }
+//        return claims.get("mail", String.class);
+//    }
 
 //    public static UUID getUuid(String token) {
 //        Claims claims = Jwts.parser()
@@ -75,7 +83,7 @@ public class JwtTokenUtil {
     }
 
     public  static String extractAuthorities(String token) {
-        Function<Claims, String> claimsListFunction = claims -> (String)claims.get("authorities");
+        Function<Claims, String> claimsListFunction = claims -> (String)claims.get("role");
         return extractClaim(token, claimsListFunction);
     }
 
