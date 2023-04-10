@@ -21,10 +21,10 @@ public class AuditEntity {
     @Column(name = "type")
     private String type;
     @Column(name = "id")
-    private String id;
+    private UUID id;
 
     public AuditEntity(UUID uuid, LocalDateTime dt_create, UUID examUser,
-                       String text, String type, String id) {
+                       String text, String type, UUID id) {
         this.uuid = uuid;
         this.dt_create = dt_create;
         this.examUser = examUser;
@@ -76,11 +76,11 @@ public class AuditEntity {
         this.type = type;
     }
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 

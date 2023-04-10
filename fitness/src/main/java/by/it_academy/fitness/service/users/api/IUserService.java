@@ -15,7 +15,7 @@ public interface IUserService {
 
     UserDto getCart(UUID id) throws MultipleErrorResponse;
 
-    boolean create(UserRegistrationDto userRegistration);
+    boolean create(UserRegistrationDto userRegistration) throws MultipleErrorResponse;
 
     UserDetailsDto login (UserLoginDto userLoginDto);
 

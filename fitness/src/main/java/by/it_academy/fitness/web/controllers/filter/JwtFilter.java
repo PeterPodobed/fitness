@@ -2,6 +2,9 @@ package by.it_academy.fitness.web.controllers.filter;
 
 import by.it_academy.fitness.core.dto.users.UserDto;
 import by.it_academy.fitness.core.exception.MultipleErrorResponse;
+import by.it_academy.fitness.dao.api.IUserDao;
+import by.it_academy.fitness.dao.entity.users.UserEntity;
+import by.it_academy.fitness.service.convertion.users.IUserEntityToDto;
 import by.it_academy.fitness.service.users.api.IUserService;
 import by.it_academy.fitness.web.controllers.utils.JwtTokenUtil;
 import jakarta.servlet.FilterChain;
@@ -31,13 +34,21 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final UserDetailsService userService;
     private final JwtTokenUtil jwtTokenUtil;
-    private final IUserService iUserService;
+//    private final IUserService iUserService;
+    private final IUserEntityToDto iUserEntityToDto;
+    private final IUserDao iUserDao;
 
 
-    public JwtFilter(UserDetailsService userService, JwtTokenUtil jwtTokenUtil, IUserService iUserService) {
+    public String token;
+
+    public JwtFilter(UserDetailsService userService, JwtTokenUtil jwtTokenUtil,
+//                     IUserService iUserService,
+                     IUserEntityToDto iUserEntityToDto, IUserDao iUserDao) {
         this.userService = userService;
         this.jwtTokenUtil = jwtTokenUtil;
-        this.iUserService = iUserService;
+//        this.iUserService = iUserService;
+        this.iUserEntityToDto = iUserEntityToDto;
+        this.iUserDao = iUserDao;
     }
 
     @Override
@@ -52,7 +63,9 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        final String token = header.split(" ")[1].trim();
+//        final String token = header.split(" ")[1].trim();
+        token = header.split(" ")[1].trim();
+
         if (!jwtTokenUtil.validate(token)) {
             chain.doFilter(request, response);
             return;
@@ -61,8 +74,11 @@ public class JwtFilter extends OncePerRequestFilter {
         String jwt = null;
         UserDto userModel = null;
 
+
         try {
-            userModel = iUserService.findUserByMail(JwtTokenUtil.getUsername(token));
+//            userModel = iUserEntityToDto.convertUserEntityToDto(iUserDao.findByMail(JwtTokenUtil.getUsername(token)).get());
+//            userModel = iUserService.findUserByMail(JwtTokenUtil.getUsername(token));
+            userModel = findUserByMail(JwtTokenUtil.getUsername(token));
         } catch (UsernameNotFoundException e) {
             chain.doFilter(request, response);
             return;
@@ -86,4 +102,18 @@ public class JwtFilter extends OncePerRequestFilter {
 
         }
         chain.doFilter(request, response);
-    }}
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    private UserDto findUserByMail(String mail) throws MultipleErrorResponse {
+        UserEntity user = iUserDao.findByMail(mail).get();
+        return iUserEntityToDto.convertUserEntityToDto(user);
+    }
+}

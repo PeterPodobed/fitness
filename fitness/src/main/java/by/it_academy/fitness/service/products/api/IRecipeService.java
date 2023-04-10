@@ -11,9 +11,9 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public interface IRecipeService {
-    void create(RecipeCreateDto recipeCreate) throws SingleErrorResponse;
+    void create(RecipeCreateDto recipeCreate) throws SingleErrorResponse, MultipleErrorResponse;
 
     PageDto<RecipeDto> getPage(int number, int size) throws MultipleErrorResponse;
 
-    void updateRecipe(UUID uuid, LocalDateTime dt_update, RecipeCreateDto recipeCreateDto) throws SingleErrorResponse;
+    void updateRecipe(UUID uuid, LocalDateTime dt_update, RecipeCreateDto recipeCreateDto) throws SingleErrorResponse, MultipleErrorResponse;
 }

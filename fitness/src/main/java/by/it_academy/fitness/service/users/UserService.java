@@ -2,6 +2,8 @@ package by.it_academy.fitness.service.users;
 
 
 import by.it_academy.fitness.core.dto.PageDto;
+import by.it_academy.fitness.core.dto.audit.AuditData;
+import by.it_academy.fitness.core.dto.audit.enums.EssenceType;
 import by.it_academy.fitness.core.dto.users.*;
 import by.it_academy.fitness.core.dto.users.enums.UserStatus;
 import by.it_academy.fitness.core.exception.MultipleErrorResponse;
@@ -13,10 +15,13 @@ import by.it_academy.fitness.dao.entity.users.UserEntity;
 
 import by.it_academy.fitness.dao.entity.users.UserRoleEntity;
 import by.it_academy.fitness.dao.entity.users.UserStatusEntity;
+import by.it_academy.fitness.service.audit.api.IAuditService;
 import by.it_academy.fitness.service.convertion.users.IDtoToUserEntity;
 import by.it_academy.fitness.service.convertion.users.IUserEntityToDto;
 import by.it_academy.fitness.service.mail.MailService;
 import by.it_academy.fitness.service.users.api.IUserService;
+import by.it_academy.fitness.web.controllers.filter.JwtFilter;
+import by.it_academy.fitness.web.controllers.utils.JwtTokenUtil;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,20 +38,21 @@ public class UserService implements IUserService {
     private final IUserDao iUserDao;
     private final IUserEntityToDto iUserEntityToDto;
     private final PasswordEncoder encoder;
-    private final UserDetailsManager userManager;
     private final IDtoToUserEntity iDtoToUserEntity;
-    private final ConversionService conversionService;
+    private final JwtFilter jwtFilter;
+    private final IAuditService iAuditService;
 
+    private String type = String.valueOf(EssenceType.USER);
 
-    public UserService(IUserDao iUserDao, IUserEntityToDto iUserEntityToDto,
-                       PasswordEncoder encoder, UserDetailsManager userManager, IDtoToUserEntity iDtoToUserEntity,
-                       ConversionService conversionService) {
+    public UserService(IUserDao iUserDao, IUserEntityToDto iUserEntityToDto, PasswordEncoder encoder,
+                       IDtoToUserEntity iDtoToUserEntity,
+                       JwtFilter jwtFilter, IAuditService iAuditService) {
         this.iUserDao = iUserDao;
         this.iUserEntityToDto = iUserEntityToDto;
         this.encoder = encoder;
-        this.userManager = userManager;
         this.iDtoToUserEntity = iDtoToUserEntity;
-        this.conversionService = conversionService;
+        this.jwtFilter = jwtFilter;
+        this.iAuditService = iAuditService;
     }
 
     @Override
@@ -57,13 +63,22 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public boolean create(UserRegistrationDto userRegistration) {
+    public boolean create(UserRegistrationDto userRegistration) throws MultipleErrorResponse {
         MailService mailService = new MailService();
         Optional<UserEntity> userEntity = iUserDao.findByMail(userRegistration.getMail());
         if (userEntity.isEmpty()) {
             UserEntity entity = iDtoToUserEntity.convertDtoToEntityByUser(userRegistration);
             mailService.sendSimpleMessage(entity.getMail(), "Verification code", entity.getVerificationCode());
+//            String mail = JwtTokenUtil.getUsername(jwtFilter.getToken());
             iUserDao.save(entity);
+
+            AuditData auditData = new AuditData(
+                    userRegistration.getMail(),
+                    "Создана запись в журнале регистрации",
+                    type,
+                    null
+            );
+            iAuditService.createReport(auditData);
             return true;
         } else throw new UserMessage("Пользователь с таким email уже зарегистрирован");
 
@@ -107,7 +122,8 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void update(UUID uuid, LocalDateTime dt_update, UserCreateDto user) throws SingleErrorResponse {
+    public void update(UUID uuid, LocalDateTime dt_update, UserCreateDto user)
+            throws SingleErrorResponse, MultipleErrorResponse {
         UserEntity userEntity = iUserDao.findById(uuid).orElseThrow(() ->
                 new SingleErrorResponse("NoSuchElement", "Неизвестный uuid"));
         if (userEntity.getDtUpdate().equals(dt_update)) {
@@ -116,7 +132,15 @@ public class UserService implements IUserService {
             userEntity.setFio(user.getFio());
             userEntity.setRole(new UserRoleEntity(user.getRole()));
             userEntity.setStatus(new UserStatusEntity(user.getStatus()));
+            String mail = JwtTokenUtil.getUsername(jwtFilter.getToken());
+            AuditData auditData = new AuditData(
+                    mail,
+                    "Обновлена запись в журнале пользователей",
+                    type,
+                    uuid
+            );
             iUserDao.save(userEntity);
+            iAuditService.createReport(auditData);
         } else {
             throw new SingleErrorResponse("error", "Пользователь уже обновлен");
         }
@@ -136,7 +160,8 @@ public class UserService implements IUserService {
 
     @Override
     public UserDto findUserByMail(String mail) throws MultipleErrorResponse {
-        UserEntity user = iUserDao.findByMail(mail).get();
+        Optional<UserEntity> findUserEntity = iUserDao.findByMail(mail);
+        UserEntity user = findUserEntity.get();
         return iUserEntityToDto.convertUserEntityToDto(user);
     }
 }

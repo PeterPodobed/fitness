@@ -22,6 +22,7 @@ public class ConverseAudit implements IConverseAudit {
 
     @Override
     public AuditEntity convertDtoToAuditEntity(AuditDto auditDto) {
+
         return new AuditEntity(UUID.randomUUID(),
                 LocalDateTime.now(),
                 auditDto.getUser(),
@@ -37,7 +38,7 @@ public class ConverseAudit implements IConverseAudit {
         user.put("uuid", userEntity.getUuid());
         user.put("mail", userEntity.getMail());
         user.put("fio", userEntity.getFio());
-        user.put("role", userEntity.getRole());
+        user.put("role", userEntity.getRole().getRole());
 
         return new AuditDtoOut(auditEntity.getUuid(),
                 auditEntity.getDt_create(),

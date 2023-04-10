@@ -12,9 +12,9 @@ import java.util.UUID;
 
 public interface IProductService {
 
-    boolean createProduct(ProductCreateDto productCreateDTO);
+    boolean createProduct(ProductCreateDto productCreateDTO) throws MultipleErrorResponse;
 
-    void updateProduct(UUID uuid, LocalDateTime dt_update, ProductCreateDto productCreateDto);
+    void updateProduct(UUID uuid, LocalDateTime dt_update, ProductCreateDto productCreateDto) throws MultipleErrorResponse;
 
     Optional<ProductEntity> findByUUID (UUID uuid);
 

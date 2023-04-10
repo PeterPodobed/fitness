@@ -11,10 +11,10 @@ public class AuditDtoOut {
     private Map<String, Object> user;
     private String text;
     private String type;
-    private String id;
+    private UUID id;
 
     public AuditDtoOut(UUID uuid, LocalDateTime dt_create, Map<String, Object> user,
-                       String text, String type, String id) {
+                       String text, String type, UUID id) {
         this.uuid = uuid;
         this.dt_create = dt_create;
         this.user = user;
@@ -63,11 +63,11 @@ public class AuditDtoOut {
         this.type = type;
     }
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 

@@ -27,25 +27,16 @@ import java.util.UUID;
 @RequestMapping("/api/v1/users")
 public class UserController {
     private final IUserService iUserService;
-    private final PasswordEncoder encoder;
     private final JwtTokenUtil jwtTokenUtil;
-    private final IUserEntityToDto iUserEntityToDto;
-    private final UserDetailsManager userManager;
-    private final IUserDao iUserDao;
 
 
-    public UserController(IUserService iUserService, PasswordEncoder encoder, JwtTokenUtil jwtTokenUtil,
-                          IUserEntityToDto iUserEntityToDto, UserDetailsManager userManager, IUserDao iUserDao) {
+    public UserController(IUserService iUserService, JwtTokenUtil jwtTokenUtil) {
         this.iUserService = iUserService;
-        this.encoder = encoder;
         this.jwtTokenUtil = jwtTokenUtil;
-        this.iUserEntityToDto = iUserEntityToDto;
-        this.userManager = userManager;
-        this.iUserDao = iUserDao;
     }
 
     @RequestMapping(path = "/registration", method = RequestMethod.POST)
-    protected ResponseEntity<?> createUser(@RequestBody UserRegistrationDto userRegistration) {
+    protected ResponseEntity<?> createUser(@RequestBody UserRegistrationDto userRegistration) throws MultipleErrorResponse {
         if (iUserService.create(userRegistration)) {
             return new ResponseEntity<>(HttpStatus.CREATED);
         }

@@ -53,12 +53,15 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/users/verification").permitAll()
                 .requestMatchers("/api/v1/users/login").permitAll()
                 .requestMatchers("/api/v1/users/me").authenticated()
-                .requestMatchers("/api/v1/users/").hasRole("ADMIN")
+                .requestMatchers("/api/v1/users/**").hasRole("ADMIN")
                 .requestMatchers("/api/v1/users").hasRole("ADMIN")
                 .requestMatchers("/api/v1/product").hasRole("ADMIN")
-                .requestMatchers("/api/v1/product/").hasRole("ADMIN")
+                .requestMatchers("/api/v1/product/**").hasRole("ADMIN")
                 .requestMatchers("/api/v1/recipe").hasRole("ADMIN")
-                .requestMatchers("/api/v1/recipe/").hasRole("ADMIN"));
+                .requestMatchers("/api/v1/recipe/**").hasRole("ADMIN")
+                .requestMatchers("/api/v1/audit/**").hasRole("ADMIN")
+                .requestMatchers("/api/v1/audit").hasRole("ADMIN")
+        );
 
 
         http.addFilterBefore(

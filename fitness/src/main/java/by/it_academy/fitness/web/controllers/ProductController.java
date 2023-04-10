@@ -23,7 +23,7 @@ public class ProductController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    protected ResponseEntity<?> doPost(@RequestBody ProductCreateDto productCreateDTO) {
+    protected ResponseEntity<?> doPost(@RequestBody ProductCreateDto productCreateDTO) throws MultipleErrorResponse {
         if (service.createProduct(productCreateDTO)) {
             return new ResponseEntity<>(HttpStatus.CREATED);
         }
@@ -33,7 +33,7 @@ public class ProductController {
     @PutMapping(path = "{uuid}/dt_update/{dt_update}")
     protected ResponseEntity<?> update(@PathVariable("uuid") UUID uuid,
                                        @PathVariable("dt_update") LocalDateTime dt_update,
-                                       @RequestBody ProductCreateDto product) {
+                                       @RequestBody ProductCreateDto product) throws MultipleErrorResponse {
         service.updateProduct(uuid, dt_update, product);
         return new ResponseEntity<>(HttpStatus.OK);
     }

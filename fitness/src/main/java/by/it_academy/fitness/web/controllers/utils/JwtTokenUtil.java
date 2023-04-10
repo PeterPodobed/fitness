@@ -35,11 +35,11 @@ public class JwtTokenUtil {
                 .compact();
     }
 
-    public Map<String, Object> getClaim(UserDetailsDto user){
+    public Map<String, Object> getClaim(UserDetailsDto user) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("uuid", user.getUuid());
         claims.put("fio", user.getFio());
-        claims.put("date create user",user.getDt_create().toString());
+        claims.put("date create user", user.getDt_create().toString());
         claims.put("date update user", user.getDt_update().toString());
         claims.put("role", user.getRole());
         claims.put("status", user.getStatus());
@@ -52,28 +52,27 @@ public class JwtTokenUtil {
                 .parseClaimsJws(token)
                 .getBody();
         return claims.getSubject();
-//        return extractClaim(token, Claims::getSubject);
     }
 
-//    public String getUserMail(String token) {
-//        Claims claims = Jwts.parser()
-//                .setSigningKey(jwtSecret)
-//                .parseClaimsJws(token)
-//                .getBody();
-//
-//        return claims.get("mail", String.class);
-//    }
+    public static String getUserRole(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(jwtSecret)
+                .parseClaimsJws(token)
+                .getBody();
 
-//    public static UUID getUuid(String token) {
-//        Claims claims = Jwts.parser()
-//                .setSigningKey(jwtSecret)
-//                .parseClaimsJws(token)
-//                .getBody();
-//        return claims.get("uuid", UUID);
-//    }
+        return claims.get("role", String.class);
+    }
+
+    public static UUID getUuid(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(jwtSecret)
+                .parseClaimsJws(token)
+                .getBody();
+        return claims.get("uuid", UUID.class);
+    }
 
 
-    private static  <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+    private static <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
@@ -82,8 +81,8 @@ public class JwtTokenUtil {
         return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
     }
 
-    public  static String extractAuthorities(String token) {
-        Function<Claims, String> claimsListFunction = claims -> (String)claims.get("role");
+    public static String extractAuthorities(String token) {
+        Function<Claims, String> claimsListFunction = claims -> (String) claims.get("role");
         return extractClaim(token, claimsListFunction);
     }
 

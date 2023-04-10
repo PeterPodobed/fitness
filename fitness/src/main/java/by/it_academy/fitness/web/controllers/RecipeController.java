@@ -25,7 +25,7 @@ public class RecipeController {
 
     @RequestMapping(method = RequestMethod.POST)
     protected ResponseEntity<?> createRecipe(@RequestBody @Validated RecipeCreateDto recipeCreate)
-            throws SingleErrorResponse {
+            throws SingleErrorResponse, MultipleErrorResponse {
         iRecipeService.create(recipeCreate);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -40,7 +40,7 @@ public class RecipeController {
     @PutMapping(path = "{uuid}/dt_update/{dt_update}")
     protected ResponseEntity<?> update(@PathVariable("uuid") UUID uuid,
                                        @PathVariable("dt_update") LocalDateTime dt_update,
-                                       @RequestBody RecipeCreateDto recipe) throws SingleErrorResponse {
+                                       @RequestBody RecipeCreateDto recipe) throws SingleErrorResponse, MultipleErrorResponse {
         iRecipeService.updateRecipe(uuid, dt_update, recipe);
         return new ResponseEntity<>(HttpStatus.OK);
     }

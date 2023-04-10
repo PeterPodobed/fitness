@@ -1,6 +1,7 @@
 package by.it_academy.fitness.service.products;
 
 import by.it_academy.fitness.core.dto.PageDto;
+import by.it_academy.fitness.core.dto.audit.AuditData;
 import by.it_academy.fitness.core.dto.audit.AuditDto;
 import by.it_academy.fitness.core.dto.audit.enums.EssenceType;
 import by.it_academy.fitness.core.dto.products.ProductCreateDto;
@@ -15,6 +16,7 @@ import by.it_academy.fitness.service.audit.api.IAuditService;
 import by.it_academy.fitness.service.convertion.products.api.IDtoToProductEntity;
 import by.it_academy.fitness.service.convertion.products.api.IProductEntityToDto;
 import by.it_academy.fitness.service.products.api.IProductService;
+import by.it_academy.fitness.web.controllers.filter.JwtFilter;
 import by.it_academy.fitness.web.controllers.utils.JwtTokenUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -31,43 +33,40 @@ public class ProductService implements IProductService {
     private final IDtoToProductEntity iDtoToProductEntity;
     private final IProductEntityToDto iProductEntityToDto;
     private final IAuditService iAuditService;
-    private final IUserDao iUserDao;
+    private final JwtFilter jwtFilter;
     private String type = String.valueOf(EssenceType.PRODUCT);
 
 
     public ProductService(IProductDao iProductDao, IDtoToProductEntity iDtoToProductEntity,
                           IProductEntityToDto iProductEntityToDto, IAuditService iAuditService,
-                          IUserDao iUserDao) {
+                          JwtFilter jwtFilter) {
         this.iProductDao = iProductDao;
         this.iDtoToProductEntity = iDtoToProductEntity;
         this.iProductEntityToDto = iProductEntityToDto;
         this.iAuditService = iAuditService;
-        this.iUserDao = iUserDao;
+        this.jwtFilter = jwtFilter;
     }
 
     @Override
-    public boolean createProduct(ProductCreateDto productCreateDTO) {
+    public boolean createProduct(ProductCreateDto productCreateDTO) throws MultipleErrorResponse {
         Optional<ProductEntity> productEntity = iProductDao.findByTitle(productCreateDTO.getTitle());
         if (productEntity.isEmpty()) {
             ProductEntity entity = iDtoToProductEntity.convertDtoToProductEntity(productCreateDTO);
+            String mail = JwtTokenUtil.getUsername(jwtFilter.getToken());
+            AuditData auditData = new AuditData(
+                    mail,
+                    "Создана запись в журнале питания",
+                    type,
+                    null
+            );
+            iAuditService.createReport(auditData);
             iProductDao.save(entity);
-//            UserHolder userHolder = new UserHolder();
-//            UUID uuid = userHolder.getUser().getUuid();
-//            String mail = iUserDao.findByMail(JwtTokenUtil.getUsername())
-//                    AuditDto auditDto = new AuditDto(
-//                    UUID.randomUUID(),
-//                    LocalDateTime.now(),
-//                    uuid,
-//                    "Создан новый продукт",
-//                    type,
-//                    "id");
-//            iAuditService.createReport(auditDto);
             return true;
         } else throw new UserMessage("Продукт с таким названием уже зарегистрирован");
     }
 
     @Override
-    public void updateProduct(UUID uuid, LocalDateTime dt_update, ProductCreateDto productCreateDto) {
+    public void updateProduct(UUID uuid, LocalDateTime dt_update, ProductCreateDto productCreateDto) throws MultipleErrorResponse {
         Optional<ProductEntity> findEntityUuid = iProductDao.findById(uuid);
         ProductEntity productEntity = findEntityUuid.get();
         if (productEntity != null) {
@@ -79,6 +78,14 @@ public class ProductService implements IProductService {
                 productEntity.setProteins(productCreateDto.getProteins());
                 productEntity.setFats(productCreateDto.getFats());
                 productEntity.setCarbohydrates(productCreateDto.getCarbohydrates());
+                String mail = JwtTokenUtil.getUsername(jwtFilter.getToken());
+                AuditData auditData = new AuditData(
+                        mail,
+                        "Обновлена запись в журнале питания",
+                        type,
+                        uuid
+                );
+                iAuditService.createReport(auditData);
                 iProductDao.save(productEntity);
             } else {
                 throw new IllegalArgumentException("Введите корректную последнюю дату обновления продукта");

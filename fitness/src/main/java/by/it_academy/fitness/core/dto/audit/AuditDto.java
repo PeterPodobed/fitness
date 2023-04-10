@@ -11,10 +11,10 @@ public class AuditDto {
     private UUID user;
     private String text;
     private String type;
-    private String id;
+    private UUID id;
 
     public AuditDto(UUID uuid, LocalDateTime dt_create, UUID user,
-                    String text, String type, String id) {
+                    String text, String type, UUID id) {
         this.uuid = uuid;
         this.dt_create = dt_create;
         this.user = user;
@@ -63,11 +63,11 @@ public class AuditDto {
         this.type = type;
     }
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 

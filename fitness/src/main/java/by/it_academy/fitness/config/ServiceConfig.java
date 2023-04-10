@@ -18,6 +18,7 @@ import by.it_academy.fitness.service.users.AdminService;
 import by.it_academy.fitness.service.users.UserService;
 import by.it_academy.fitness.service.users.api.IAdminService;
 import by.it_academy.fitness.service.users.api.IUserService;
+import by.it_academy.fitness.web.controllers.filter.JwtFilter;
 import by.it_academy.fitness.web.controllers.utils.JwtTokenUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,43 +32,52 @@ import org.springframework.security.provisioning.UserDetailsManager;
 public class ServiceConfig {
 
     @Bean
-    public IAdminService adminService (IAdminDao dao) {
+    public IAdminService adminService(IAdminDao dao) {
         return new AdminService(dao);
     }
 
     @Bean
-    public IUserService userService (IUserDao iUserDao,
-                                     IUserEntityToDto iUserEntityToDto,
-                                     PasswordEncoder encoder,
-                                     UserDetailsManager userManager,
-                                     IDtoToUserEntity iDtoToUserEntity,
-                                     ConversionService conversionService) {
-        return new UserService(iUserDao, iUserEntityToDto, encoder, userManager,
-                iDtoToUserEntity, conversionService);
+    public IUserService userService(IUserDao iUserDao,
+                                    IUserEntityToDto iUserEntityToDto,
+                                    PasswordEncoder encoder,
+                                    IDtoToUserEntity iDtoToUserEntity,
+                                    JwtFilter jwtFilter,
+                                    IAuditService iAuditService) {
+        return new UserService(iUserDao, iUserEntityToDto, encoder,
+                iDtoToUserEntity, jwtFilter, iAuditService);
     }
 
     @Bean
-    public IProductService productService (IProductDao iProductDao,
-                                           IDtoToProductEntity iDtoToProductEntity,
-                                           IProductEntityToDto iProductEntityToDto,
-                                           IAuditService iAuditService,
-                                           IUserDao iUserDao) {
-        return new ProductService(iProductDao, iDtoToProductEntity, iProductEntityToDto, iAuditService, iUserDao);
+    public IProductService productService(IProductDao iProductDao,
+                                          IDtoToProductEntity iDtoToProductEntity,
+                                          IProductEntityToDto iProductEntityToDto,
+                                          IAuditService iAuditService,
+                                          JwtFilter jwtFilter) {
+        return new ProductService(iProductDao, iDtoToProductEntity, iProductEntityToDto,
+                iAuditService, jwtFilter);
     }
 
     @Bean
-    public IRecipeService recipeService (IRecipeDao iRecipeDao,
-                                         IProductDao iProductDao,
-                                         IRecipeEntityToDto iRecipeEntityToDto,
-                                         ICalculationRecipe iCalculationRecipe,
-                                         IProductService iProductService){
-        return new RecipeService(iRecipeDao, iProductDao, iRecipeEntityToDto, iCalculationRecipe, iProductService);
+    public IRecipeService recipeService(IRecipeDao iRecipeDao,
+                                        IProductDao iProductDao,
+                                        IRecipeEntityToDto iRecipeEntityToDto,
+                                        ICalculationRecipe iCalculationRecipe,
+                                        IProductService iProductService,
+                                        JwtFilter jwtFilter,
+                                        IAuditService iAuditService) {
+        return new RecipeService(iRecipeDao, iProductDao, iRecipeEntityToDto, iCalculationRecipe,
+                iProductService, jwtFilter, iAuditService);
     }
 
     @Bean
-    public IAuditService auditService (IAuditDao iAuditDao,
-                                       IConverseAudit iAuditDtoToAuditEntity) {
-        return new AuditService(iAuditDao, iAuditDtoToAuditEntity);
+    public IAuditService auditService(IAuditDao iAuditDao,
+                                      IConverseAudit iAuditDtoToAuditEntity,
+//                                      IUserService iUserService,
+                                      IUserEntityToDto iUserEntityToDto,
+                                      IUserDao iUserDao) {
+        return new AuditService(iAuditDao, iAuditDtoToAuditEntity,
+//                iUserService,
+                iUserEntityToDto, iUserDao);
     }
 
     @Bean
