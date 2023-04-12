@@ -52,9 +52,10 @@ public class ServiceConfig {
                                           IDtoToProductEntity iDtoToProductEntity,
                                           IProductEntityToDto iProductEntityToDto,
                                           IAuditService iAuditService,
-                                          JwtFilter jwtFilter) {
+                                          JwtFilter jwtFilter,
+                                          ConversionService conversionService) {
         return new ProductService(iProductDao, iDtoToProductEntity, iProductEntityToDto,
-                iAuditService, jwtFilter);
+                iAuditService, jwtFilter, conversionService);
     }
 
     @Bean

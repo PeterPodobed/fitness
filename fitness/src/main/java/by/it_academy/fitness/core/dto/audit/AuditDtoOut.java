@@ -1,5 +1,8 @@
 package by.it_academy.fitness.core.dto.audit;
 
+import by.it_academy.fitness.service.convertion.json.LocalDateTimeToLongSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -7,6 +10,7 @@ import java.util.UUID;
 
 public class AuditDtoOut {
     private UUID uuid;
+    @JsonSerialize(using = LocalDateTimeToLongSerializer.class)
     private LocalDateTime dt_create;
     private Map<String, Object> user;
     private String text;

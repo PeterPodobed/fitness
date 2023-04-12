@@ -3,6 +3,7 @@ package by.it_academy.fitness.dao.entity.users;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -165,6 +166,20 @@ public class UserEntity {
 
     public void setVerificationCode(String verificationCode) {
         this.verificationCode = verificationCode;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserEntity that = (UserEntity) o;
+        return Objects.equals(uuid, that.uuid) && Objects.equals(dtCreate, that.dtCreate) && Objects.equals(dtUpdate, that.dtUpdate) && Objects.equals(mail, that.mail) && Objects.equals(fio, that.fio) && Objects.equals(role, that.role) && Objects.equals(status, that.status) && Objects.equals(verificationCode, that.verificationCode) && Objects.equals(password, that.password);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uuid, dtCreate, dtUpdate, mail, fio, role, status, verificationCode, password);
     }
 
     @Override

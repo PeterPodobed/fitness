@@ -18,6 +18,7 @@ import by.it_academy.fitness.service.convertion.products.api.IProductEntityToDto
 import by.it_academy.fitness.service.products.api.IProductService;
 import by.it_academy.fitness.web.controllers.filter.JwtFilter;
 import by.it_academy.fitness.web.controllers.utils.JwtTokenUtil;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -34,17 +35,20 @@ public class ProductService implements IProductService {
     private final IProductEntityToDto iProductEntityToDto;
     private final IAuditService iAuditService;
     private final JwtFilter jwtFilter;
+    private final ConversionService conversionService;
+
     private String type = String.valueOf(EssenceType.PRODUCT);
 
 
     public ProductService(IProductDao iProductDao, IDtoToProductEntity iDtoToProductEntity,
                           IProductEntityToDto iProductEntityToDto, IAuditService iAuditService,
-                          JwtFilter jwtFilter) {
+                          JwtFilter jwtFilter, ConversionService conversionService) {
         this.iProductDao = iProductDao;
         this.iDtoToProductEntity = iDtoToProductEntity;
         this.iProductEntityToDto = iProductEntityToDto;
         this.iAuditService = iAuditService;
         this.jwtFilter = jwtFilter;
+        this.conversionService = conversionService;
     }
 
     @Override

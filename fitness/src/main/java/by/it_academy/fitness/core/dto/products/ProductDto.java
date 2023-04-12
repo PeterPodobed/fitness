@@ -4,13 +4,17 @@ package by.it_academy.fitness.core.dto.products;
 import by.it_academy.fitness.core.exception.MultipleErrorResponse;
 import by.it_academy.fitness.core.exception.validationProducts.ProductCreateTitleValid;
 import by.it_academy.fitness.core.exception.validationProducts.ProductCreateValid;
+import by.it_academy.fitness.service.convertion.json.LocalDateTimeToLongSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class ProductDto {
     private UUID uuid;
+    @JsonSerialize(using = LocalDateTimeToLongSerializer.class)
     private LocalDateTime dt_create;
+    @JsonSerialize(using = LocalDateTimeToLongSerializer.class)
     private LocalDateTime dt_update;
     private String title;
     private int weight;

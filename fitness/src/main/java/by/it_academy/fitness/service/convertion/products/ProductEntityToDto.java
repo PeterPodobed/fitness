@@ -6,6 +6,9 @@ import by.it_academy.fitness.dao.entity.products.ProductEntity;
 import by.it_academy.fitness.service.convertion.products.api.IProductEntityToDto;
 import org.springframework.stereotype.Component;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+
 @Component
 public class ProductEntityToDto implements IProductEntityToDto {
     @Override

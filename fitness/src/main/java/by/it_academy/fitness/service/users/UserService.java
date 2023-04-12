@@ -30,6 +30,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 //@Service
@@ -69,7 +71,6 @@ public class UserService implements IUserService {
         if (userEntity.isEmpty()) {
             UserEntity entity = iDtoToUserEntity.convertDtoToEntityByUser(userRegistration);
             mailService.sendSimpleMessage(entity.getMail(), "Verification code", entity.getVerificationCode());
-//            String mail = JwtTokenUtil.getUsername(jwtFilter.getToken());
             iUserDao.save(entity);
 
             AuditData auditData = new AuditData(
@@ -102,7 +103,7 @@ public class UserService implements IUserService {
         if (code.equals(userEntity.getVerificationCode())) {
             userEntity.setStatus(new UserStatusEntity(UserStatus.ACTIVATED));
             iUserDao.save(userEntity);
-            throw new UserMessage("Пользователь активирован");
+
         } else throw new UserMessage("Пользователь не активирован");
     }
 
@@ -121,26 +122,33 @@ public class UserService implements IUserService {
                 userEntityPage.isLast(), listDto);
     }
 
+
     @Override
     public void update(UUID uuid, LocalDateTime dt_update, UserCreateDto user)
             throws SingleErrorResponse, MultipleErrorResponse {
+        String email = user.getMail();
+        Optional<UserEntity> userMailFind = iUserDao.findByMail(email);
         UserEntity userEntity = iUserDao.findById(uuid).orElseThrow(() ->
                 new SingleErrorResponse("NoSuchElement", "Неизвестный uuid"));
         if (userEntity.getDtUpdate().equals(dt_update)) {
-            userEntity.setDtUpdate(LocalDateTime.now());
-            userEntity.setMail(user.getMail());
-            userEntity.setFio(user.getFio());
-            userEntity.setRole(new UserRoleEntity(user.getRole()));
-            userEntity.setStatus(new UserStatusEntity(user.getStatus()));
-            String mail = JwtTokenUtil.getUsername(jwtFilter.getToken());
-            AuditData auditData = new AuditData(
-                    mail,
-                    "Обновлена запись в журнале пользователей",
-                    type,
-                    uuid
-            );
-            iUserDao.save(userEntity);
-            iAuditService.createReport(auditData);
+            if ((!userEntity.getMail().equals(user.getMail()) & userMailFind.isEmpty()) || userEntity.getMail().equals(user.getMail())) {
+                userEntity.setDtUpdate(LocalDateTime.now());
+                userEntity.setMail(user.getMail());
+                userEntity.setFio(user.getFio());
+                userEntity.setRole(new UserRoleEntity(user.getRole()));
+                userEntity.setStatus(new UserStatusEntity(user.getStatus()));
+                String mail = JwtTokenUtil.getUsername(jwtFilter.getToken());
+                AuditData auditData = new AuditData(
+                        mail,
+                        "Обновлена запись в журнале пользователей",
+                        type,
+                        uuid
+                );
+                iUserDao.save(userEntity);
+                iAuditService.createReport(auditData);
+            } else {
+                throw new SingleErrorResponse("error", "Пользователь с таким e-mail уже существует");
+            }
         } else {
             throw new SingleErrorResponse("error", "Пользователь уже обновлен");
         }
@@ -164,4 +172,5 @@ public class UserService implements IUserService {
         UserEntity user = findUserEntity.get();
         return iUserEntityToDto.convertUserEntityToDto(user);
     }
+
 }

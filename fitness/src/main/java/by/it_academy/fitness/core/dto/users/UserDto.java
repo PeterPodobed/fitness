@@ -5,7 +5,9 @@ import by.it_academy.fitness.core.dto.users.enums.UserStatus;
 import by.it_academy.fitness.core.exception.MultipleErrorResponse;
 import by.it_academy.fitness.core.exception.validationUsers.EmailValid;
 import by.it_academy.fitness.core.exception.validationUsers.FioValid;
+import by.it_academy.fitness.service.convertion.json.LocalDateTimeToLongSerializer;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -13,7 +15,9 @@ import java.util.UUID;
 
 public class UserDto {
     private UUID uuid;
+    @JsonSerialize(using = LocalDateTimeToLongSerializer.class)
     private LocalDateTime dt_create;
+    @JsonSerialize(using = LocalDateTimeToLongSerializer.class)
     private LocalDateTime dt_update;
     private String mail;
     private String fio;

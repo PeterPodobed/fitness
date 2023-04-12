@@ -1,12 +1,15 @@
 package by.it_academy.fitness.core.dto.audit;
 
 import by.it_academy.fitness.core.dto.audit.enums.EssenceType;
+import by.it_academy.fitness.service.convertion.json.LocalDateTimeToLongSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class AuditDto {
     private UUID uuid;
+    @JsonSerialize(using = LocalDateTimeToLongSerializer.class)
     private LocalDateTime dt_create;
     private UUID user;
     private String text;

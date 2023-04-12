@@ -4,6 +4,8 @@ import by.it_academy.fitness.core.exception.MultipleErrorResponse;
 import by.it_academy.fitness.core.exception.validationRecipe.RecipeCreateTitleValid;
 import by.it_academy.fitness.core.exception.validationRecipe.RecipeCreateValid;
 import by.it_academy.fitness.dao.entity.products.CompositionEntity;
+import by.it_academy.fitness.service.convertion.json.LocalDateTimeToLongSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -11,7 +13,9 @@ import java.util.UUID;
 
 public class RecipeDto {
     private UUID uuid;
+    @JsonSerialize(using = LocalDateTimeToLongSerializer.class)
     private LocalDateTime dt_create;
+    @JsonSerialize(using = LocalDateTimeToLongSerializer.class)
     private LocalDateTime dt_update;
     private String title;
     private List<CompositionDtoParam> composition;
